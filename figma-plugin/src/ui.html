@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UX Audit Sync</title>
+  <!-- Modern Typographic Foundation -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client library via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    /* ---------------------------------- */
+    /* Swiss Minimal Premium Style System */
+    /* ---------------------------------- */
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      /* Vibrant harmonious colors */
+      --color-brand: #E63525;          /* Surgical Accent Red */
+      --color-brand-hover: #C5291C;
+      --color-bg: var(--figma-color-bg, #FFFFFF);
+      --color-text: var(--figma-color-text, #333333);
+      --color-border: var(--figma-color-border, #E5E5E5);
+      --color-surface: var(--figma-color-bg-secondary, #F9F9F9);
+      --color-text-muted: var(--figma-color-text-secondary, #777777);
+      
+      --radius: 6px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 32px);
+      box-sizing: border-box;
+    }
+
+    /* Core Layout */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed var(--color-border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--color-brand);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--color-surface);
+      padding: 2px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      border-radius: calc(var(--radius) - 2px);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      background: var(--color-bg);
+      color: var(--color-text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Views */
+    .view-pane {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .view-pane.active {
+      display: flex;
+    }
+
+    /* Standard Elements */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--color-brand);
+      background-color: var(--color-bg);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      padding: 10px 14px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFFFFF;
+      background-color: var(--color-brand);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background-color: var(--color-brand-hover);
+    }
+
+    .btn:disabled {
+      background-color: var(--color-border);
+      color: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    /* Sessions List container */
+    .session-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-right: 2px;
+    }
+
+    .session-item {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      background-color: var(--color-surface);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .session-item:hover {
+      border-color: var(--color-brand);
+      background-color: var(--color-bg);
+    }
+
+    .session-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .session-name {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.active { background-color: #E2F0D9; color: #385723; }
+    .badge.uploading { background-color: #FFF2CC; color: #7F6000; animation: blink 1.5s infinite; }
+    .badge.complete { background-color: #DDEBF7; color: #1F4E79; }
+    .badge.failed { background-color: #FCE4D6; color: #C65911; }
+
+    .session-details {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 32px;
+      color: var(--color-text-muted);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius);
+    }
+
+    .empty-state svg {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 8px;
+      stroke: var(--color-border);
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      border-top: 1px dashed var(--color-border);
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 28px;
+      height: 16px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--color-border);
+      transition: .2s;
+      border-radius: 16px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px; width: 12px;
+      left: 2px; bottom: 2px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--color-brand);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(12px);
+    }
+
+    /* Toast Notification */
+    .status-msg {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 8px;
+      text-align: center;
+      min-height: 16px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background-color: var(--color-border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: var(--color-brand);
+      transition: width 0.1s ease;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo-dot"></div>
+      <div class="logo-text">UX Audit Sync</div>
+    </div>
+    <div style="font-family: var(--font-mono); font-size: 9px; color: var(--color-brand); font-weight: 600;">v1.0</div>
+  </div>
+
+  <!-- Segmented Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-sync" onclick="switchTab('sync')">Sync</button>
+    <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">Settings</button>
+  </div>
+
+  <!-- VIEW: SYNC DASHBOARD -->
+  <div class="view-pane active" id="view-sync">
+    <!-- User Sessions List -->
+    <div class="session-list" id="session-list-container">
+      <!-- Session cards will render dynamically here -->
+      <div class="empty-state">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span style="font-weight: 500; font-size: 11px;" id="empty-state-title">Connection & Sign-In Required</span>
+        <span style="font-size: 9px; margin-top: 4px;" id="empty-state-subtitle">Please set up your Supabase credentials and Sign In under the Settings tab.</span>
+      </div>
+    </div>
+
+    <!-- Active Canvas Controls -->
+    <div class="controls-panel" style="display: flex; flex-direction: column; gap: 8px;">
+      <div class="toggle-row" style="padding: 4px 0;">
+        <div>
+          <div style="font-weight: 600; font-size: 11px;">Show Tap Overlays</div>
+          <div style="font-size: 9px; color: var(--color-text-muted);">Toggles overlay indicator layers inside Figma</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-indicators-chk" checked onchange="handleIndicatorToggle()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Tap Size Slider Control -->
+      <div class="toggle-row" style="padding: 4px 0; display: flex; flex-direction: column; align-items: stretch; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div>
+            <div style="font-weight: 600; font-size: 11px;">Tap Overlay Size</div>
+            <div style="font-size: 9px; color: var(--color-text-muted);">Adjusts the width/height of hotspots</div>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--color-brand);" id="tap-size-display">48px</div>
+        </div>
+        <input type="range" id="tap-size-slider" min="24" max="80" value="48" style="width: 100%; height: 4px; background: var(--color-border); border-radius: 2px; -webkit-appearance: none; cursor: pointer; outline: none; accent-color: var(--color-brand);" oninput="updateTapSizeDisplay(this.value)">
+      </div>
+    </div>
+
+    <!-- Progress & Status indicator -->
+    <div class="progress-bar-container" id="sync-progress-container">
+      <div class="progress-bar-fill" id="sync-progress-fill"></div>
+    </div>
+    <div class="status-msg" id="status-message">Ready</div>
+  </div>
+
+  <!-- VIEW: SETTINGS -->
+  <div class="view-pane" id="view-settings">
+    <div style="flex: 1; overflow-y: auto; padding-right: 2px; display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Unified Account Authentication -->
+      <div id="auth-section-container" style="border: 1px solid var(--color-border); border-radius: var(--radius); padding: 12px;">
+        <div style="font-weight: 600; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">Account Authentication</div>
+        
+        <!-- Signed In State -->
+        <div id="auth-signed-in" style="display: none; flex-direction: column; gap: 8px;">
+          <div style="font-size: 12px; color: var(--color-text);">Signed in as: <b id="auth-email-display">user@example.com</b></div>
+          <button class="btn" style="background-color: #555; padding: 6px 12px; font-size: 11px;" onclick="handleSignOut()">Sign Out</button>
+        </div>
+
+        <!-- Signed Out State -->
+        <div id="auth-signed-out" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Segmented Login/Signup Control -->
+          <div style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius);">
+            <button id="auth-toggle-signin" class="tab-btn active" style="padding: 4px;" onclick="toggleAuthMode('signin')">Sign In</button>
+            <button id="auth-toggle-signup" class="tab-btn" style="padding: 4px;" onclick="toggleAuthMode('signup')">Sign Up</button>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 4px;">
+            <label for="input-email">Email Address</label>
+            <input type="email" id="input-email" placeholder="you@example.com" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 4px;">
+            <label for="input-password">Password</label>
+            <input type="password" id="input-password" placeholder="••••••••" />
+          </div>
+
+          <button class="btn" id="btn-auth-action" onclick="handleAuthAction()">Sign In</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------------
+    // State Variables & Initialization
+    // ----------------------------------
+    // Production database credentials (hidden from UI inputs)
+    const SB_URL = "https://naneeovpzwyfnbaaujpi.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbmVlb3Zwend5Zm5iYWF1anBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTYwMzIsImV4cCI6MjA5NTc3MjAzMn0.Ilb6N52RvkwpiQ8iI0vGpIvDOysNgkubzXFh5sSUoUk";
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let activeAuthMode = 'signin'; // 'signin' or 'signup'
+    let sessionsList = [];
+    let pollingInterval = null;
+
+    // Load persisted settings and initialize Supabase Auth on launch
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        
+        // Retrieve current active session
+        const sessionResult = await supabaseClient.auth.getSession();
+        if (sessionResult.data.session) {
+          updateAuthState(sessionResult.data.session.user);
+        } else {
+          updateAuthState(null);
+        }
+        
+        startPolling();
+      } catch (e) {
+        updateStatus("Client Init Error: " + e.message);
+      }
+    });
+
+    // Handle view switching tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active'));
+
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      document.getElementById(`view-${tabId}`).classList.add('active');
+
+      if (tabId === 'sync' && supabaseClient) {
+        fetchSessions();
+      }
+    }
+
+    // Toggle between Sign In and Sign Up modes
+    function toggleAuthMode(mode) {
+      activeAuthMode = mode;
+      document.getElementById('auth-toggle-signin').classList.remove('active');
+      document.getElementById('auth-toggle-signup').classList.remove('active');
+      document.getElementById(`auth-toggle-${mode}`).classList.add('active');
+      
+      const actionBtn = document.getElementById('btn-auth-action');
+      actionBtn.innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
+    }
+
+    // Execute authentication via Supabase Auth
+    async function handleAuthAction() {
+      if (!supabaseClient) {
+        updateStatus("Database client is not initialized.");
+        return;
+      }
+
+      const email = document.getElementById('input-email').value.trim();
+      const password = document.getElementById('input-password').value;
+
+      if (!email || !password) {
+        updateStatus("Email and password are required.");
+        return;
+      }
+
+      updateStatus(activeAuthMode === 'signin' ? "Signing in..." : "Signing up...");
+
+      try {
+        let authResult;
+        if (activeAuthMode === 'signin') {
+          authResult = await supabaseClient.auth.signInWithPassword({ email, password });
+        } else {
+          authResult = await supabaseClient.auth.signUp({ email, password });
+        }
+
+        if (authResult.error) throw authResult.error;
+
+        const user = authResult.data.user;
+        updateStatus(activeAuthMode === 'signin' ? "Signed in successfully!" : "Sign up successful! Please sign in.");
+        
+        if (activeAuthMode === 'signin') {
+          updateAuthState(user);
+          switchTab('sync');
+        } else {
+          toggleAuthMode('signin');
+        }
+
+      } catch (err) {
+        console.error(err);
+        updateStatus(`Auth failed: ${err.message || err}`);
+      }
+    }
+
+    // Sign out active user session
+    async function handleSignOut() {
+      if (!supabaseClient) return;
+      try {
+        await supabaseClient.auth.signOut();
+        updateAuthState(null);
+        updateStatus("Signed out successfully.");
+      } catch (e) {
+        updateStatus("Sign out failed: " + e.message);
+      }
+    }
+
+    // Update screen view state dependent on Authentication state
+    function updateAuthState(user) {
+      currentUser = user;
+      const signedInNode = document.getElementById('auth-signed-in');
+      const signedOutNode = document.getElementById('auth-signed-out');
+      const emptyStateTitle = document.getElementById('empty-state-title');
+      const emptyStateSubtitle = document.getElementById('empty-state-subtitle');
+
+      if (user) {
+        signedInNode.style.display = 'flex';
+        signedOutNode.style.display = 'none';
+        document.getElementById('auth-email-display').innerText = user.email;
+        
+        if (emptyStateTitle) {
+          emptyStateTitle.innerText = "No Flows Recorded Yet";
+          emptyStateSubtitle.innerHTML = `Start recording a session on your phone under user email: <b>${user.email}</b>`;
+        }
+        
+        fetchSessions();
+      } else {
+        signedInNode.style.display = 'none';
+        signedOutNode.style.display = 'flex';
+        
+        if (emptyStateTitle) {
+          emptyStateTitle.innerText = "Sign-In Required";
+          emptyStateSubtitle.innerText = "Please Sign In under the Settings tab to access your audit flows.";
+        }
+        
+        sessionsList = [];
+        renderSessions();
+      }
+    }
+
+    // Helper to log status alerts
+    function updateStatus(msg) {
+      document.getElementById('status-message').innerText = msg;
+    }
+
+    // ----------------------------------
+    // Data Fetching & Sync Logic
+    // ----------------------------------
+    async function fetchSessions() {
+      if (!supabaseClient || !currentUser) {
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('sessions')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        sessionsList = data || [];
+        renderSessions();
+      } catch (err) {
+        console.error(err);
+        updateStatus(`Fetch failed: ${err.message}`);
+      }
+    }
+
+    // Renders the session history list
+    function renderSessions() {
+      const container = document.getElementById('session-list-container');
+      container.innerHTML = '';
+
+      if (sessionsList.length === 0) {
+        const isUserAuthenticated = supabaseClient && currentUser;
+        
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4a2 2 0 012-2m16 0h-2M4 13H6" />
+            </svg>
+            <span style="font-weight: 500; font-size: 11px;" id="empty-state-title">
+              ${isUserAuthenticated ? "No Flows Recorded Yet" : "Sign-In Required"}
+            </span>
+            <span style="font-size: 9px; margin-top: 4px;" id="empty-state-subtitle">
+              ${isUserAuthenticated ? "Start recording a session on your companion app." : "Please Sign In under the Settings tab to access your audit flows."}
+            </span>
+          </div>
+        `;
+        return;
+      }
+
+      sessionsList.forEach(session => {
+        const dateStr = new Date(session.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        const card = document.createElement('div');
+        card.className = 'session-item';
+        card.onclick = () => handleSessionClick(session);
+
+        card.innerHTML = `
+          <div class="session-meta">
+            <div class="session-name">${escapeHtml(session.flow_name)}</div>
+            <span class="badge ${session.status}">${session.status}</span>
+          </div>
+          <div class="session-details">
+            <div>Device: <b>${escapeHtml(session.device_model || 'Unknown')}</b></div>
+            <div>Date: <b>${dateStr}</b></div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Session selection callback
+    async function handleSessionClick(session) {
+      if (session.status !== 'complete') {
+        updateStatus(`Flow is still uploading or active (${session.status}).`);
+        return;
+      }
+
+      await importSession(session);
+    }
+
+    // Main sync process
+    async function importSession(session) {
+      updateStatus(`Fetching screens metadata...`);
+      showProgressBar(true);
+      setProgressBar(10);
+
+      try {
+        // 1. Fetch screen list from database
+        const { data: screens, error } = await supabaseClient
+          .from('screens')
+          .select('*')
+          .eq('session_id', session.id)
+          .order('sequence_index', { ascending: true });
+
+        if (error) throw error;
+
+        if (!screens || screens.length === 0) {
+          updateStatus("No screens found in this session.");
+          showProgressBar(false);
+          return;
+        }
+
+        setProgressBar(25);
+        updateStatus(`Downloading ${screens.length} screenshots...`);
+
+        // 2. Download all screenshots & parse to Byte Arrays (Uint8Array) for Figma main thread
+        const processedScreens = [];
+        
+        for (let i = 0; i < screens.length; i++) {
+          const s = screens[i];
+          const progressStep = 25 + Math.floor((i / screens.length) * 65);
+          setProgressBar(progressStep);
+          updateStatus(`Downloading screen ${i + 1}/${screens.length}...`);
+
+          try {
+            const response = await fetch(s.image_url);
+            if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+            
+            const buffer = await response.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+
+            // Load the image bytes into a temporary HTML Image to determine exact dimensions
+            const blob = new Blob([bytes], { type: 'image/png' });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            const img = new Image();
+            await new Promise((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => {
+                // Fallback to session dimensions if image loading fails
+                img.naturalWidth = session.screen_width_px || 360;
+                img.naturalHeight = session.screen_height_px || 800;
+                resolve();
+              };
+              img.src = blobUrl;
+            });
+            
+            const imageWidth = img.naturalWidth || session.screen_width_px || 360;
+            const imageHeight = img.naturalHeight || session.screen_height_px || 800;
+            URL.revokeObjectURL(blobUrl);
+
+            processedScreens.push({
+              sequence_index: s.sequence_index,
+              tap_x_pct: parseFloat(s.tap_x_pct),
+              tap_y_pct: parseFloat(s.tap_y_pct),
+              screen_width_px: imageWidth,
+              screen_height_px: imageHeight,
+              imageBytes: bytes
+            });
+          } catch (fetchErr) {
+            console.error(`Failed to download screen index ${i}:`, fetchErr);
+            throw new Error(`Failed to download screen ${i + 1}: ${fetchErr.message || fetchErr}`);
+          }
+        }
+
+        setProgressBar(95);
+        updateStatus(`Rendering frames on canvas...`);
+
+        const tapSize = parseInt(document.getElementById('tap-size-slider').value) || 48;
+
+        // 3. Post data payload to code.ts (Figma main thread)
+        parent.postMessage({
+          pluginMessage: {
+            type: 'import-flow',
+            flowName: session.flow_name,
+            screens: processedScreens,
+            tapSize: tapSize
+          }
+        }, '*');
+
+      } catch (err) {
+        console.error(err);
+        updateStatus(`Import failed: ${err.message}`);
+        showProgressBar(false);
+      }
+    }
+
+    // Update the slider value display
+    function updateTapSizeDisplay(val) {
+      document.getElementById('tap-size-display').innerText = `${val}px`;
+    }
+
+    // Toggle overlay visibility
+    function handleIndicatorToggle() {
+      const isChecked = document.getElementById('toggle-indicators-chk').checked;
+      
+      parent.postMessage({
+        pluginMessage: {
+          type: 'toggle-indicators',
+          visible: isChecked
+        }
+      }, '*');
+    }
+
+    // Background polling for newly uploaded sessions
+    function startPolling() {
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = setInterval(() => {
+        fetchSessions();
+      }, 5000); // Poll every 5 seconds
+    }
+
+    // Progress bar utility controls
+    function showProgressBar(show) {
+      document.getElementById('sync-progress-container').style.display = show ? 'block' : 'none';
+    }
+
+    function setProgressBar(pct) {
+      document.getElementById('sync-progress-fill').style.width = `${pct}%`;
+    }
+
+    // Helper to sanitize HTML strings
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Receive plugin messages (success/failure response)
+    window.onmessage = async (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      if (msg.type === 'success' || msg.type === 'status') {
+        updateStatus(msg.message);
+        showProgressBar(false);
+      }
+      
+      if (msg.type === 'error') {
+        updateStatus(`Error: ${msg.message}`);
+        showProgressBar(false);
+      }
+    };
+  </script>
+</body>
+</html>

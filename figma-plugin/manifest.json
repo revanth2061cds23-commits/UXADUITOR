@@ -1,0 +1,19 @@
+{
+  "name": "UX Audit Sync",
+  "id": "ux-audit-sync-plugin",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://*.supabase.co",
+      "https://*.supabase.in",
+      "https://cdn.jsdelivr.net",
+      "https://images.unsplash.com",
+      "https://*.unsplash.com"
+    ]
+  }
+}

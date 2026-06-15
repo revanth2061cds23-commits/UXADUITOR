@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UX Auditor</string>
+    <string name="accessibility_desc">Enables silent background touch tracking to overlay tap indicators inside your Figma UX flows.</string>
+</resources>
