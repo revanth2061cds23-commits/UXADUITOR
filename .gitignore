@@ -29,3 +29,8 @@ local.properties
 .env.local
 .env.*.local
 *.secret
+
+# Agent configuration files
+.agents/
+.mcp.json
+skills-lock.json
