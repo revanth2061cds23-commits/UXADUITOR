@@ -576,7 +576,13 @@
         if (activeAuthMode === 'signin') {
           authResult = await supabaseClient.auth.signInWithPassword({ email, password });
         } else {
-          authResult = await supabaseClient.auth.signUp({ email, password });
+          authResult = await supabaseClient.auth.signUp({ 
+            email, 
+            password,
+            options: {
+              emailRedirectTo: 'https://figma.com'
+            }
+          });
         }
 
         if (authResult.error) throw authResult.error;
