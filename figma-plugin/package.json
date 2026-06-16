@@ -1,5 +1,5 @@
 {
-  "name": "ux-audit-sync-figma-plugin",
+  "name": "sync-screen-figma-plugin",
   "version": "1.0.0",
   "description": "Figma plugin to sync UX audit flows and overlays from Android.",
   "main": "dist/code.js",

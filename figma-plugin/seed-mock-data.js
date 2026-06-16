@@ -1,5 +1,5 @@
 // ==========================================
-// UX Audit Sync — Supabase Seed Mock Script
+// Sync Screen — Supabase Seed Mock Script
 // Seeds mock session and screens directly to your database
 // Run using: node seed-mock-data.js <SUPABASE_URL> <SUPABASE_ANON_KEY>
 // ==========================================

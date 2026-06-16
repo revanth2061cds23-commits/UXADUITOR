@@ -5,6 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.io.File
+import java.util.UUID
+import android.net.Uri
+import android.webkit.MimeTypeMap
+import android.content.ContentResolver
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
@@ -127,6 +132,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         return list
     }
+
+    fun updateScreenSequence(screenId: String, newSeq: Int) {
+        val db = writableDatabase
+        val cv = ContentValues().apply {
+            put(COL_SEQ_INDEX, newSeq)
+        }
+        db.update(TABLE_SCREENS, cv, "${COL_SCREEN_ID} = ?", arrayOf(screenId))
+    }
+
+    fun deleteScreen(screenId: String) {
+        val db = writableDatabase
+        db.delete(TABLE_SCREENS, "${COL_SCREEN_ID} = ?", arrayOf(screenId))
+    }
 }
 
 data class LocalScreen(
@@ -138,3 +156,29 @@ data class LocalScreen(
     val tapYPct: Float,
     val tag: String?
 )
+
+fun copyUriToCache(context: Context, uri: Uri): File? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+        val extension = getExtensionFromUri(context, uri) ?: "png"
+        val file = File(context.cacheDir, "manual_screen_${UUID.randomUUID()}.$extension")
+        inputStream.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        file
+    } catch (e: Exception) {
+        android.util.Log.e("DatabaseHelper", "Error copying uri to cache", e)
+        null
+    }
+}
+
+fun getExtensionFromUri(context: Context, uri: Uri): String? {
+    return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+        val mimeType = context.contentResolver.getType(uri)
+        MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+    } else {
+        MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+    }
+}

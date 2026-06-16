@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UX Audit Sync</title>
+  <title>Sync Screen</title>
   <!-- Modern Typographic Foundation -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -367,7 +367,7 @@
   <div class="header">
     <div class="logo-container">
       <div class="logo-dot"></div>
-      <div class="logo-text">UX Audit Sync</div>
+      <div class="logo-text">Sync Screen</div>
     </div>
     <div style="font-family: var(--font-mono); font-size: 9px; color: var(--color-brand); font-weight: 600;">v1.0</div>
   </div>
@@ -447,6 +447,9 @@
             <button id="auth-toggle-signup" class="tab-btn" style="padding: 4px;" onclick="toggleAuthMode('signup')">Sign Up</button>
           </div>
 
+          <!-- Inline Error Alert Banner -->
+          <div id="auth-error-message" style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;"></div>
+
           <div class="form-group" style="margin-bottom: 4px;">
             <label for="input-email">Email Address</label>
             <input type="email" id="input-email" placeholder="you@example.com" />
@@ -455,6 +458,11 @@
           <div class="form-group" style="margin-bottom: 4px;">
             <label for="input-password">Password</label>
             <input type="password" id="input-password" placeholder="••••••••" />
+          </div>
+
+          <!-- Forgot Password Link -->
+          <div id="forgot-password-container" style="display: flex; justify-content: flex-end; margin-top: -4px; margin-bottom: 4px;">
+            <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;" onclick="handleForgotPassword()">Forgot Password?</span>
           </div>
 
           <button class="btn" id="btn-auth-action" onclick="handleAuthAction()">Sign In</button>
@@ -518,12 +526,38 @@
       
       const actionBtn = document.getElementById('btn-auth-action');
       actionBtn.innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
+
+      // Hide error message on mode toggle
+      hideAuthError();
+
+      // Show/Hide forgot password link
+      document.getElementById('forgot-password-container').style.display = mode === 'signin' ? 'flex' : 'none';
+    }
+
+    function showAuthError(msg, isSuccess = false) {
+      const errBox = document.getElementById('auth-error-message');
+      errBox.innerText = msg;
+      errBox.style.display = 'block';
+      if (isSuccess) {
+        errBox.style.color = '#1E4620';
+        errBox.style.backgroundColor = '#E8F5E9';
+        errBox.style.borderColor = '#C8E6C9';
+      } else {
+        errBox.style.color = '#FF3B30';
+        errBox.style.backgroundColor = '#FFEBE9';
+        errBox.style.borderColor = '#FFC4C0';
+      }
+    }
+
+    function hideAuthError() {
+      document.getElementById('auth-error-message').style.display = 'none';
     }
 
     // Execute authentication via Supabase Auth
     async function handleAuthAction() {
+      hideAuthError();
       if (!supabaseClient) {
-        updateStatus("Database client is not initialized.");
+        showAuthError("Database client is not initialized.");
         return;
       }
 
@@ -531,7 +565,7 @@
       const password = document.getElementById('input-password').value;
 
       if (!email || !password) {
-        updateStatus("Email and password are required.");
+        showAuthError("Email and password are required.");
         return;
       }
 
@@ -555,11 +589,42 @@
           switchTab('sync');
         } else {
           toggleAuthMode('signin');
+          showAuthError("Sign up successful! Check your email to confirm registration, then sign in.", true);
         }
 
       } catch (err) {
         console.error(err);
+        showAuthError(err.message || err.toString());
         updateStatus(`Auth failed: ${err.message || err}`);
+      }
+    }
+
+    // Request reset password link
+    async function handleForgotPassword() {
+      hideAuthError();
+      if (!supabaseClient) {
+        showAuthError("Database client is not initialized.");
+        return;
+      }
+
+      const email = document.getElementById('input-email').value.trim();
+      if (!email) {
+        showAuthError("Please enter your email address in the field above to reset your password.");
+        return;
+      }
+
+      updateStatus("Sending reset link...");
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.href // Redirects back to plugin context
+        });
+        if (error) throw error;
+        showAuthError("Password reset link has been sent to your email!", true);
+        updateStatus("Reset link sent.");
+      } catch (err) {
+        console.error(err);
+        showAuthError(`Failed to send reset email: ${err.message || err}`);
+        updateStatus("Reset request failed.");
       }
     }
 
@@ -757,8 +822,8 @@
 
             processedScreens.push({
               sequence_index: s.sequence_index,
-              tap_x_pct: parseFloat(s.tap_x_pct),
-              tap_y_pct: parseFloat(s.tap_y_pct),
+              tap_x_pct: s.tap_x_pct != null ? parseFloat(s.tap_x_pct) : -1,
+              tap_y_pct: s.tap_y_pct != null ? parseFloat(s.tap_y_pct) : -1,
               screen_width_px: imageWidth,
               screen_height_px: imageHeight,
               imageBytes: bytes

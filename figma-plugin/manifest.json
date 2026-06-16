@@ -1,6 +1,6 @@
 {
-  "name": "UX Audit Sync",
-  "id": "ux-audit-sync-plugin",
+  "name": "Sync Screen",
+  "id": "1648803155486236303",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
@@ -9,11 +9,8 @@
   ],
   "networkAccess": {
     "allowedDomains": [
-      "https://*.supabase.co",
-      "https://*.supabase.in",
-      "https://cdn.jsdelivr.net",
-      "https://images.unsplash.com",
-      "https://*.unsplash.com"
+      "https://naneeovpzwyfnbaaujpi.supabase.co"
     ]
-  }
+  },
+  "documentAccess": "dynamic-page"
 }

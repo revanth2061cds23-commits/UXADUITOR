@@ -1,5 +1,5 @@
 // ==========================================
-// UX Audit Sync — Figma Plugin Sandbox Code
+// Sync Screen — Figma Plugin Sandbox Code
 // Coordinates canvas drawing on the main thread
 // ==========================================
 
@@ -67,9 +67,8 @@ figma.ui.onmessage = async (msg) => {
           }
         ];
 
-        // 3. Render the Tap Indicator layer if coordinates exist
-        // Coordinates of 0.0, 0.0 might be standard or skipped if not a tap
-        if (s.tap_x_pct !== undefined && s.tap_y_pct !== undefined) {
+        // 3. Render the Tap Indicator layer if coordinates exist and are valid (non-negative and non-NaN)
+        if (s.tap_x_pct !== undefined && s.tap_y_pct !== undefined && !isNaN(s.tap_x_pct) && !isNaN(s.tap_y_pct) && s.tap_x_pct >= 0 && s.tap_y_pct >= 0) {
           const absoluteX = s.tap_x_pct * width;
           const absoluteY = s.tap_y_pct * height;
 

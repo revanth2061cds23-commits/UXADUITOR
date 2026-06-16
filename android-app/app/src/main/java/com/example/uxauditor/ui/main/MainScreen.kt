@@ -118,47 +118,71 @@ fun MainScreen(
                         label = { Text("Flow Name (e.g. Onboarding)") },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
                     )
-                    Button(
-                        onClick = {
-                            if (flowName.isEmpty()) {
-                                Toast.makeText(context, "Flow Name is required.", Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-
-                            // 1. Request Draw Overlay (SYSTEM_ALERT_WINDOW) Permission if not granted
-                            if (!android.provider.Settings.canDrawOverlays(context)) {
-                                Toast.makeText(context, "Please grant 'Display over other apps' permission to show the floating button.", Toast.LENGTH_LONG).show()
-                                val intent = Intent(
-                                    android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                    android.net.Uri.parse("package:${context.packageName}")
-                                )
-                                context.startActivity(intent)
-                                return@Button
-                            }
-
-                            // 2. Request Accessibility Service Permission if not granted
-                            val enabledServices = android.provider.Settings.Secure.getString(
-                                context.contentResolver,
-                                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-                            )
-                            val serviceName = "${context.packageName}/com.example.uxauditor.services.AuditAccessibilityService"
-                            val isAccessibilityEnabled = enabledServices?.contains(serviceName) == true
-
-                            if (!isAccessibilityEnabled) {
-                                Toast.makeText(context, "Please enable 'UX Auditor Tap Tracker' in Installed Services to track taps automatically.", Toast.LENGTH_LONG).show()
-                                val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                context.startActivity(intent)
-                                return@Button
-                            }
-
-                            // Request MediaProjection permissions
-                            val mediaProjManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-                            launcher.launch(mediaProjManager.createScreenCaptureIntent())
-                        },
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63525))
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("Start Audit Capture", color = Color.White)
+                        Button(
+                            onClick = {
+                                if (flowName.isEmpty()) {
+                                    Toast.makeText(context, "Flow Name is required.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                // 1. Request Draw Overlay (SYSTEM_ALERT_WINDOW) Permission if not granted
+                                if (!android.provider.Settings.canDrawOverlays(context)) {
+                                    Toast.makeText(context, "Please grant 'Display over other apps' permission to show the floating button.", Toast.LENGTH_LONG).show()
+                                    val intent = Intent(
+                                        android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        android.net.Uri.parse("package:${context.packageName}")
+                                    )
+                                    context.startActivity(intent)
+                                    return@Button
+                                }
+
+                                // 2. Request Accessibility Service Permission if not granted
+                                val enabledServices = android.provider.Settings.Secure.getString(
+                                    context.contentResolver,
+                                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                                )
+                                val serviceName = "${context.packageName}/com.example.uxauditor.services.AuditAccessibilityService"
+                                val isAccessibilityEnabled = enabledServices?.contains(serviceName) == true
+
+                                if (!isAccessibilityEnabled) {
+                                    Toast.makeText(context, "Please enable 'UX Auditor Tap Tracker' in Installed Services to track taps automatically.", Toast.LENGTH_LONG).show()
+                                    val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                    context.startActivity(intent)
+                                    return@Button
+                                }
+
+                                // Request MediaProjection permissions
+                                val mediaProjManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+                                launcher.launch(mediaProjManager.createScreenCaptureIntent())
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63525))
+                        ) {
+                            Text("Auto Capture", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = {
+                                if (flowName.isEmpty()) {
+                                    Toast.makeText(context, "Flow Name is required.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                val sessionId = UUID.randomUUID().toString()
+                                // Save to SQLite
+                                db.insertSession(sessionId, flowName, android.os.Build.MODEL, 1080, 1920)
+                                // Navigate directly to review screen
+                                onViewSession(sessionId)
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63525))
+                        ) {
+                            Text("Manual Flow", color = Color.White)
+                        }
                     }
                 }
             }
