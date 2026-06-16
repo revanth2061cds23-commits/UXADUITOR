@@ -588,14 +588,15 @@
         if (authResult.error) throw authResult.error;
 
         const user = authResult.data.user;
-        updateStatus(activeAuthMode === 'signin' ? "Signed in successfully!" : "Sign up successful! Please sign in.");
         
         if (activeAuthMode === 'signin') {
+          updateStatus("Signed in successfully!");
           updateAuthState(user);
           switchTab('sync');
         } else {
           toggleAuthMode('signin');
-          showAuthError("Sign up successful! Check your email to confirm registration, then sign in.", true);
+          showAuthError("Account created successfully! Click the 'Sign In' button below to log in with your credentials.", true);
+          updateStatus("Account created successfully!");
         }
 
       } catch (err) {
