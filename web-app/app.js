@@ -4,7 +4,7 @@
 const SB_URL = "https://naneeovpzwyfnbaaujpi.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbmVlb3Zwend5Zm5iYWF1anBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTYwMzIsImV4cCI6MjA5NTc3MjAzMn0.Ilb6N52RvkwpiQ8iI0vGpIvDOysNgkubzXFh5sSUoUk";
 
-const supabase = supabase.createClient(SB_URL, SB_KEY);
+const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
 // ----------------------------------
 // Global App States
@@ -18,7 +18,7 @@ let screensList = []; // Array of { id, file, blobUrl, sequenceIndex, tapX: -1, 
 // ----------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   // Listen for Supabase Authentication state changes
-  supabase.auth.onAuthStateChange((event, session) => {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
     const user = session?.user || null;
     currentUser = user;
     updateAuthUI(user);
@@ -115,11 +115,11 @@ async function handleAuth() {
 
   try {
     if (activeAuthMode === 'signin') {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
       showAuthAlert("Sign in successful!", true);
     } else {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -147,7 +147,7 @@ async function handleAuth() {
 
 async function handleSignOut() {
   try {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
   } catch (e) {
     console.error(e);
   }
@@ -366,7 +366,7 @@ async function syncFlowToSupabase() {
     const screenWidth = firstScreen ? firstScreen.width : 1080;
     const screenHeight = firstScreen ? firstScreen.height : 1920;
     
-    const { error: sessionError } = await supabase
+    const { error: sessionError } = await supabaseClient
       .from('sessions')
       .insert({
         id: sessionId,
@@ -390,7 +390,7 @@ async function syncFlowToSupabase() {
       const remotePath = `${userUuid}/${sessionId}/${screen.sequenceIndex}.${fileExtension}`;
       
       // Upload file binary directly to 'screens' storage bucket
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabaseClient.storage
         .from('screens')
         .upload(remotePath, screen.file, {
           cacheControl: '3600',
@@ -400,12 +400,12 @@ async function syncFlowToSupabase() {
       if (uploadError) throw uploadError;
 
       // Construct public link URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = supabaseClient.storage
         .from('screens')
         .getPublicUrl(remotePath);
 
       // Insert record row into 'screens' database table
-      const { error: screenError } = await supabase
+      const { error: screenError } = await supabaseClient
         .from('screens')
         .insert({
           id: screen.id,
@@ -423,7 +423,7 @@ async function syncFlowToSupabase() {
     updateProgress(95, "Completing flow mapping...");
     const isoTimestamp = new Date().toISOString();
     
-    const { error: completeError } = await supabase
+    const { error: completeError } = await supabaseClient
       .from('sessions')
       .update({
         status: 'complete',
