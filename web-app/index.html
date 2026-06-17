@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sync Screen — Web Uploader</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo-group">
+        <div class="logo-indicator"></div>
+        <h1 class="logo-title">Sync Screen <span class="logo-badge">Web Uploader</span></h1>
+      </div>
+      <div class="status-indicator-group">
+        <span class="status-indicator-dot" id="header-status-dot"></span>
+        <span class="status-indicator-text" id="header-status-text">Disconnected</span>
+      </div>
+    </header>
+
+    <!-- AUTH PANEL (Shown when logged out) -->
+    <div id="auth-panel" class="auth-card">
+      <div class="auth-tabs">
+        <button id="tab-signin" class="auth-tab-btn active" onclick="switchAuthTab('signin')">Sign In</button>
+        <button id="tab-signup" class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      
+      <div class="auth-form-wrapper">
+        <div id="auth-alert" class="alert-box error" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label for="auth-email">Email Address</label>
+          <input type="email" id="auth-email" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••" required>
+        </div>
+        
+        <button id="btn-auth" class="action-btn" onclick="handleAuth()">Sign In</button>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD (Shown when logged in) -->
+    <div id="main-dashboard" class="dashboard-grid" style="display: none;">
+      
+      <!-- Left Column: Controls & Uploader -->
+      <aside class="controls-column">
+        
+        <!-- User account card -->
+        <div class="user-profile-card">
+          <div class="profile-info">
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 600;">Account</span>
+            <div id="user-email-display" class="user-email">user@example.com</div>
+          </div>
+          <button class="logout-btn" onclick="handleSignOut()">Sign Out</button>
+        </div>
+
+        <!-- Session settings card -->
+        <div class="settings-card">
+          <h2 class="section-title">New Session Flow</h2>
+          
+          <div class="form-group">
+            <label for="session-flow-name">Flow Name</label>
+            <input type="text" id="session-flow-name" placeholder="e.g. Onboarding Flow, Checkout Loop" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="session-device-model">Mock Device Model</label>
+            <input type="text" id="session-device-model" value="Web Uploader" placeholder="e.g. Chrome, Firefox">
+          </div>
+        </div>
+
+        <!-- File Upload Dropzone -->
+        <div class="dropzone-card" id="dropzone">
+          <input type="file" id="file-input" multiple accept="image/png, image/jpeg" style="display: none;" onchange="handleFileSelect(event)">
+          <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <div class="dropzone-title">Drag & drop your screenshots here</div>
+          <div class="dropzone-subtitle">or <span class="browse-link" onclick="triggerFileSelect()">browse files</span> from your computer</div>
+          <div class="dropzone-specs">Supports PNG, JPG (dimension autodetected)</div>
+        </div>
+
+        <!-- Sync Progress and Trigger -->
+        <div class="sync-actions-card">
+          <div class="progress-container" id="upload-progress-container" style="display: none;">
+            <div class="progress-header">
+              <span id="upload-progress-label">Uploading...</span>
+              <span id="upload-progress-val">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" id="upload-progress-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="status-msg-log" id="status-logger">Ready to build flow</div>
+          <button id="btn-sync-session" class="sync-btn" disabled onclick="syncFlowToSupabase()">
+            <span>Sync Flow to Figma</span>
+          </button>
+        </div>
+
+      </aside>
+
+      <!-- Right Column: Interactive Screen Flow Preview -->
+      <main class="preview-column">
+        <div class="preview-header">
+          <h2 class="section-title">Screens Sequence Flow <span class="flow-count-badge" id="flow-count">0 screens</span></h2>
+          <div class="interaction-tip" id="interaction-tip" style="display: none;">
+            💡 **Click on any screen preview** to place a Tap Hotspot indicator (red dot) where the interaction happened.
+          </div>
+        </div>
+
+        <!-- Empty state for screens -->
+        <div class="empty-preview" id="empty-preview-state">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="empty-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <div class="empty-text">No screens added yet</div>
+          <div class="empty-subtext">Add screens using the uploader panel on the left to arrange your flow.</div>
+        </div>
+
+        <!-- Image Sequence Grid -->
+        <div class="screens-grid" id="screens-grid-container" style="display: none;">
+          <!-- Screen cards generated dynamically -->
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
