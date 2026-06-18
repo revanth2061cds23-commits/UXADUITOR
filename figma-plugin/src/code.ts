@@ -9,6 +9,22 @@ figma.showUI(__html__, { width: 340, height: 500, themeColors: true });
 // Listen for messages from the iframe UI
 figma.ui.onmessage = async (msg) => {
 
+  if (msg.type === 'save-session') {
+    await figma.clientStorage.setAsync('supabase_session', msg.session);
+    return;
+  }
+
+  if (msg.type === 'clear-session') {
+    await figma.clientStorage.deleteAsync('supabase_session');
+    return;
+  }
+
+  if (msg.type === 'get-session') {
+    const session = await figma.clientStorage.getAsync('supabase_session');
+    figma.ui.postMessage({ type: 'restore-session', session });
+    return;
+  }
+
   if (msg.type === 'import-flow') {
     const { flowName, screens } = msg;
 

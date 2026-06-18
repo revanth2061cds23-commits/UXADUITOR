@@ -13,21 +13,24 @@ class SharedPreferencesHelper(context: Context) {
     fun getConnectionUrl(): String? = prefs.getString("sb_url", null)
     fun getConnectionKey(): String? = prefs.getString("sb_key", null)
 
-    fun saveAuth(token: String, userUuid: String, email: String) {
+    fun saveAuth(token: String, refreshToken: String, userUuid: String, email: String) {
         prefs.edit()
             .putString("auth_token", token)
+            .putString("refresh_token", refreshToken)
             .putString("user_uuid", userUuid)
             .putString("user_email", email)
             .apply()
     }
 
     fun getAuthToken(): String? = prefs.getString("auth_token", null)
+    fun getRefreshToken(): String? = prefs.getString("refresh_token", null)
     fun getUserUuid(): String? = prefs.getString("user_uuid", null)
     fun getUserEmail(): String? = prefs.getString("user_email", null)
 
     fun clearAuth() {
         prefs.edit()
             .remove("auth_token")
+            .remove("refresh_token")
             .remove("user_uuid")
             .remove("user_email")
             .apply()

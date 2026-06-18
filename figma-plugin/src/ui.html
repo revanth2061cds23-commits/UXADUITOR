@@ -179,64 +179,134 @@
       cursor: not-allowed;
     }
 
-    /* Sessions List container */
+    /* Sessions List Grid */
     .session-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
       flex: 1;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
       margin-bottom: 12px;
       padding-right: 2px;
     }
 
-    .session-item {
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      background-color: var(--color-surface);
+    .session-card {
+      background: #FAF6F6; /* Soft warm light gray/pink background matching the uploaded design */
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
       cursor: pointer;
-      transition: var(--transition);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .session-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      border-color: rgba(230, 53, 37, 0.15);
+    }
+
+    .card-visual-block {
+      width: 100%;
+      height: 90px;
+      background: #CCCCCC; /* Gray rounded container matching mockup */
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      overflow: visible;
+      margin-bottom: 10px;
       position: relative;
     }
 
-    .session-item:hover {
-      border-color: var(--color-brand);
-      background-color: var(--color-bg);
-    }
-
-    .session-meta {
+    .screen-tilted-stack {
+      position: relative;
+      width: 100%;
+      height: 100%;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 6px;
+      justify-content: center;
+      align-items: flex-end;
     }
 
-    .session-name {
-      font-weight: 600;
+    .mock-phone {
+      width: 38px;
+      height: 72px;
+      background: #151515;
+      border: 1.5px solid #000000;
+      border-radius: 4px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: absolute;
+      bottom: 0px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mock-phone.back-left {
+      transform: rotate(-12deg) translate(-18px, -4px) scale(0.9);
+      z-index: 1;
+      opacity: 0.8;
+    }
+
+    .mock-phone.back-right {
+      transform: rotate(12deg) translate(18px, -4px) scale(0.9);
+      z-index: 2;
+      opacity: 0.8;
+    }
+
+    .mock-phone.front-center {
+      transform: translate(0, 4px) scale(1.05);
+      z-index: 3;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .mock-screenshot {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mock-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #252830;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mock-placeholder-brand {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #FF6F61, #E63525);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-flow-name {
+      font-weight: 700;
       font-size: 12px;
+      color: #101F42; /* Brand dark blue matching mockup */
+      text-align: center;
+      margin-bottom: 2px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .badge {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .badge.active { background-color: #E2F0D9; color: #385723; }
-    .badge.uploading { background-color: #FFF2CC; color: #7F6000; animation: blink 1.5s infinite; }
-    .badge.complete { background-color: #DDEBF7; color: #1F4E79; }
-    .badge.failed { background-color: #FCE4D6; color: #C65911; }
-
-    .session-details {
-      font-size: 10px;
-      color: var(--color-text-muted);
-      display: flex;
-      gap: 12px;
+    .card-date {
+      font-size: 9px;
+      color: #8A8D93;
+      text-align: center;
     }
 
     .empty-state {
@@ -352,6 +422,18 @@
       100% { opacity: 0.5; }
     }
 
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #settings-toggle-btn svg {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.3s ease;
+    }
+
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -362,21 +444,17 @@
   </style>
 </head>
 <body>
-
-  <!-- Header Section -->
-  <div class="header">
-    <div class="logo-container">
-      <div class="logo-dot"></div>
-      <div class="logo-text">Sync Screen</div>
+  <div id="main-app-container" style="display: none; flex-direction: column; height: 100%;">
+    <!-- Header Section -->
+    <div class="header" style="border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 16px; font-weight: 700; color: #101F42; font-family: var(--font-sans);">Sync Screens.</div>
+      <div id="settings-toggle-btn" onclick="toggleSettings()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </div>
     </div>
-    <div style="font-family: var(--font-mono); font-size: 9px; color: var(--color-brand); font-weight: 600;">v1.0</div>
-  </div>
-
-  <!-- Segmented Tabs -->
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-sync" onclick="switchTab('sync')">Sync</button>
-    <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">Settings</button>
-  </div>
 
   <!-- VIEW: SYNC DASHBOARD -->
   <div class="view-pane active" id="view-sync">
@@ -470,6 +548,119 @@
       </div>
     </div>
   </div>
+  </div> <!-- #main-app-container -->
+
+  <!-- Onboarding & Auth View -->
+  <div id="onboarding-auth-container" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between; overflow-y: auto;">
+    
+    <!-- Onboarding Section -->
+    <div id="onboarding-section" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0;">
+      
+      <!-- Logo & Header -->
+      <div class="logo-container" style="justify-content: center; margin-bottom: 24px;">
+        <div class="logo-dot"></div>
+        <div class="logo-text" style="font-size: 16px;">Sync Screen</div>
+      </div>
+
+      <!-- Onboarding slides (Carousel) -->
+      <div style="position: relative; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 24px;">
+        
+        <!-- Slide 1 -->
+        <div class="onboarding-slide" id="slide-1" style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+          <div style="font-size: 36px; line-height: 1;">📱</div>
+          <div style="font-weight: 700; font-size: 14px;">1. Capture User Flows</div>
+          <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
+            Use our companion app (Android or Web) to capture screenshots and tap metadata dynamically as you audit.
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="onboarding-slide" id="slide-2" style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+          <div style="font-size: 36px; line-height: 1;">☁️</div>
+          <div style="font-weight: 700; font-size: 14px;">2. Auto-Sync to Cloud</div>
+          <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
+            All screen flows and touch coordinates sync securely to your cloud workspace instantly.
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="onboarding-slide" id="slide-3" style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+          <div style="font-size: 36px; line-height: 1;">🎨</div>
+          <div style="font-weight: 700; font-size: 14px;">3. Import to Figma</div>
+          <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
+            Import flows directly into your active canvas with elegant custom tap overlay indicator layers.
+          </div>
+        </div>
+      </div>
+
+      <!-- Dots & Action Button -->
+      <div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">
+        <!-- Indicator Dots -->
+        <div style="display: flex; gap: 6px;">
+          <div class="onboarding-dot active" id="dot-1" onclick="showSlide(1)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-brand); cursor: pointer; transition: var(--transition);"></div>
+          <div class="onboarding-dot" id="dot-2" onclick="showSlide(2)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);"></div>
+          <div class="onboarding-dot" id="dot-3" onclick="showSlide(3)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);"></div>
+        </div>
+
+        <button class="btn" id="btn-next-slide" onclick="nextSlide()" style="width: 100%;">Next</button>
+        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;" onclick="skipOnboarding()">Skip to Sign In</span>
+      </div>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0;">
+      <div class="logo-container" style="justify-content: center; margin-bottom: 16px;">
+        <div class="logo-dot"></div>
+        <div class="logo-text" style="font-size: 16px;">Sync Screen</div>
+      </div>
+
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center;">
+        <!-- Tabs header -->
+        <div style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius); margin-bottom: 8px;">
+          <button id="auth-tab-signin" class="tab-btn active" style="padding: 4px;" onclick="switchAuthTabMode('signin')">Sign In</button>
+          <button id="auth-tab-signup" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('signup')">Sign Up</button>
+          <button id="auth-tab-qr" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('qr')">QR Login</button>
+        </div>
+
+        <!-- Error Message Banner -->
+        <div id="onboarding-auth-error" style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;"></div>
+
+        <!-- Email Forms View -->
+        <div id="email-forms-view" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="form-group" style="margin-bottom: 2px;">
+            <label for="onboarding-input-email">Email Address</label>
+            <input type="email" id="onboarding-input-email" placeholder="you@example.com" />
+          </div>
+          <div class="form-group" style="margin-bottom: 2px;">
+            <label for="onboarding-input-password">Password</label>
+            <input type="password" id="onboarding-input-password" placeholder="••••••••" />
+          </div>
+          <div id="onboarding-forgot-password-container" style="display: flex; justify-content: flex-end; margin-top: -2px; margin-bottom: 4px;">
+            <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;" onclick="handleOnboardingForgotPassword()">Forgot Password?</span>
+          </div>
+          <button class="btn" id="btn-onboarding-auth" onclick="handleOnboardingAuthAction()">Sign In</button>
+        </div>
+
+        <!-- QR Login View -->
+        <div id="qr-login-view" style="display: none; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-top: 10px;">
+          <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; width: 160px; height: 160px; box-sizing: border-box;">
+            <img id="qr-code-img" src="" alt="Pairing QR Code" style="width: 136px; height: 136px; display: none;" />
+            <div id="qr-loading-spinner" style="width: 24px; height: 24px; border: 2px solid #ddd; border-top-color: var(--color-brand); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          </div>
+          <div style="font-size: 11px; color: var(--color-text-muted); line-height: 1.4; padding: 0 12px;">
+            Open the <b>UX Auditor</b> companion app or Web App on your phone, click <b>Scan QR</b>, and scan this code to login instantly.
+          </div>
+          <div id="qr-status-text" style="font-family: var(--font-mono); font-size: 10px; color: var(--color-brand); font-weight: 600;">Waiting for scanner...</div>
+        </div>
+      </div>
+
+      <!-- Back to onboarding -->
+      <div style="text-align: center; margin-top: 16px;">
+        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;" onclick="backToOnboarding()">Back to Info</span>
+      </div>
+    </div>
+
+  </div>
 
   <script>
     // ----------------------------------
@@ -485,18 +676,295 @@
     let sessionsList = [];
     let pollingInterval = null;
 
+    // Onboarding & QR Login State Variables
+    let currentSlide = 1;
+    let qrPollInterval = null;
+    let currentPairingToken = null;
+    let activeOnboardingAuthMode = 'signin';
+    let showingSettings = false;
+
+    // Onboarding Navigation helpers
+    function showSlide(slideIndex) {
+      document.querySelectorAll('.onboarding-slide').forEach(s => s.style.display = 'none');
+      document.querySelectorAll('.onboarding-dot').forEach(d => {
+        d.classList.remove('active');
+        d.style.backgroundColor = 'var(--color-border)';
+      });
+      
+      currentSlide = slideIndex;
+      document.getElementById(`slide-${slideIndex}`).style.display = 'flex';
+      
+      const dot = document.getElementById(`dot-${slideIndex}`);
+      dot.classList.add('active');
+      dot.style.backgroundColor = 'var(--color-brand)';
+      
+      const btn = document.getElementById('btn-next-slide');
+      if (slideIndex === 3) {
+        btn.innerText = "Get Started";
+      } else {
+        btn.innerText = "Next";
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < 3) {
+        showSlide(currentSlide + 1);
+      } else {
+        skipOnboarding();
+      }
+    }
+
+    function skipOnboarding() {
+      document.getElementById('onboarding-section').style.display = 'none';
+      document.getElementById('login-section').style.display = 'flex';
+      switchAuthTabMode('signin');
+    }
+
+    function backToOnboarding() {
+      stopQrPolling();
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('onboarding-section').style.display = 'flex';
+      showSlide(1);
+    }
+
+    // Onboarding Auth Form Tab Switcher
+    function switchAuthTabMode(mode) {
+      activeOnboardingAuthMode = mode;
+      document.getElementById('auth-tab-signin').classList.remove('active');
+      document.getElementById('auth-tab-signup').classList.remove('active');
+      document.getElementById('auth-tab-qr').classList.remove('active');
+      document.getElementById(`auth-tab-${mode}`).classList.add('active');
+      
+      hideOnboardingAuthError();
+      stopQrPolling();
+
+      if (mode === 'qr') {
+        document.getElementById('email-forms-view').style.display = 'none';
+        document.getElementById('qr-login-view').style.display = 'flex';
+        startQrPolling();
+      } else {
+        document.getElementById('qr-login-view').style.display = 'none';
+        document.getElementById('email-forms-view').style.display = 'flex';
+        
+        const actionBtn = document.getElementById('btn-onboarding-auth');
+        actionBtn.innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
+        document.getElementById('onboarding-forgot-password-container').style.display = mode === 'signin' ? 'flex' : 'none';
+      }
+    }
+
+    function showOnboardingAuthError(msg, isSuccess = false) {
+      const errBox = document.getElementById('onboarding-auth-error');
+      errBox.innerText = msg;
+      errBox.style.display = 'block';
+      if (isSuccess) {
+        errBox.style.color = '#1E4620';
+        errBox.style.backgroundColor = '#E8F5E9';
+        errBox.style.borderColor = '#C8E6C9';
+      } else {
+        errBox.style.color = '#FF3B30';
+        errBox.style.backgroundColor = '#FFEBE9';
+        errBox.style.borderColor = '#FFC4C0';
+      }
+    }
+
+    function hideOnboardingAuthError() {
+      document.getElementById('onboarding-auth-error').style.display = 'none';
+    }
+
+    // Onboarding form execution actions
+    async function handleOnboardingAuthAction() {
+      hideOnboardingAuthError();
+      if (!supabaseClient) {
+        showOnboardingAuthError("Database client is not initialized.");
+        return;
+      }
+
+      const email = document.getElementById('onboarding-input-email').value.trim();
+      const password = document.getElementById('onboarding-input-password').value;
+
+      if (!email || !password) {
+        showOnboardingAuthError("Email and password are required.");
+        return;
+      }
+
+      const authBtn = document.getElementById('btn-onboarding-auth');
+      authBtn.disabled = true;
+      authBtn.innerText = activeOnboardingAuthMode === 'signin' ? "Signing in..." : "Signing up...";
+
+      try {
+        let authResult;
+        if (activeOnboardingAuthMode === 'signin') {
+          authResult = await supabaseClient.auth.signInWithPassword({ email, password });
+        } else {
+          authResult = await supabaseClient.auth.signUp({ 
+            email, 
+            password,
+            options: {
+              emailRedirectTo: 'https://figma.com'
+            }
+          });
+        }
+
+        if (authResult.error) throw authResult.error;
+
+        const user = authResult.data.user;
+        
+        if (activeOnboardingAuthMode === 'signin') {
+          updateStatus("Signed in successfully!");
+          updateAuthState(user);
+        } else {
+          switchAuthTabMode('signin');
+          showOnboardingAuthError("Account created successfully! Click 'Sign In' below to log in.", true);
+        }
+
+      } catch (err) {
+        console.error(err);
+        showOnboardingAuthError(err.message || err.toString());
+      } finally {
+        authBtn.disabled = false;
+        authBtn.innerText = activeOnboardingAuthMode === 'signin' ? 'Sign In' : 'Sign Up';
+      }
+    }
+
+    async function handleOnboardingForgotPassword() {
+      hideOnboardingAuthError();
+      if (!supabaseClient) {
+        showOnboardingAuthError("Database client is not initialized.");
+        return;
+      }
+
+      const email = document.getElementById('onboarding-input-email').value.trim();
+      if (!email) {
+        showOnboardingAuthError("Please enter your email address to reset your password.");
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.href
+        });
+        if (error) throw error;
+        showOnboardingAuthError("Password reset link has been sent to your email!", true);
+      } catch (err) {
+        console.error(err);
+        showOnboardingAuthError(`Failed to send reset email: ${err.message || err}`);
+      }
+    }
+
+    // QR Login pairing system
+    async function startQrPolling() {
+      stopQrPolling();
+      if (!supabaseClient) return;
+
+      document.getElementById('qr-code-img').style.display = 'none';
+      document.getElementById('qr-loading-spinner').style.display = 'block';
+      document.getElementById('qr-status-text').innerText = "Generating token...";
+      document.getElementById('qr-status-text').style.color = "var(--color-text-muted)";
+
+      currentPairingToken = crypto.randomUUID();
+
+      try {
+        const { error } = await supabaseClient
+          .from('qr_pairings')
+          .insert({
+            token: currentPairingToken,
+            status: 'pending'
+          });
+
+        if (error) throw error;
+
+        const qrImg = document.getElementById('qr-code-img');
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${currentPairingToken}`;
+        qrImg.onload = () => {
+          document.getElementById('qr-loading-spinner').style.display = 'none';
+          qrImg.style.display = 'block';
+          document.getElementById('qr-status-text').innerText = "Ready to scan";
+          document.getElementById('qr-status-text').style.color = "var(--color-brand)";
+        };
+
+        qrPollInterval = setInterval(async () => {
+          if (!currentPairingToken) return;
+
+          const { data, error: pollError } = await supabaseClient
+            .from('qr_pairings')
+            .select('*')
+            .eq('token', currentPairingToken)
+            .maybeSingle();
+
+          if (pollError) {
+            console.error("Polling error:", pollError);
+            return;
+          }
+
+          if (data && data.status === 'paired') {
+            stopQrPolling();
+            document.getElementById('qr-status-text').innerText = "Pairing successful! Logging in...";
+            document.getElementById('qr-status-text').style.color = "var(--color-success, #10b981)";
+
+            const { data: sessionData, error: sessionError } = await supabaseClient.auth.setSession({
+              access_token: data.access_token,
+              refresh_token: data.refresh_token || ''
+            });
+
+            if (sessionError) {
+              showOnboardingAuthError("Session setup failed: " + sessionError.message);
+              return;
+            }
+
+            await supabaseClient
+              .from('qr_pairings')
+              .delete()
+              .eq('token', data.token);
+
+            updateStatus("Linked successfully via QR Code!");
+            updateAuthState(sessionData.user);
+          }
+        }, 2000);
+
+      } catch (err) {
+        console.error("Failed to start QR code auth flow:", err);
+        document.getElementById('qr-loading-spinner').style.display = 'none';
+        document.getElementById('qr-status-text').innerText = "Failed to load QR code";
+        document.getElementById('qr-status-text').style.color = "red";
+      }
+    }
+
+    function stopQrPolling() {
+      if (qrPollInterval) {
+        clearInterval(qrPollInterval);
+        qrPollInterval = null;
+      }
+      currentPairingToken = null;
+    }
+
     // Load persisted settings and initialize Supabase Auth on launch
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         supabaseClient = supabase.createClient(SB_URL, SB_KEY);
         
-        // Retrieve current active session
-        const sessionResult = await supabaseClient.auth.getSession();
-        if (sessionResult.data.session) {
-          updateAuthState(sessionResult.data.session.user);
-        } else {
-          updateAuthState(null);
-        }
+        // Listen for auth state changes to persist/clear session
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          if (session) {
+            parent.postMessage({
+              pluginMessage: {
+                type: 'save-session',
+                session: {
+                  access_token: session.access_token,
+                  refresh_token: session.refresh_token
+                }
+              }
+            }, '*');
+          } else {
+            parent.postMessage({
+              pluginMessage: {
+                type: 'clear-session'
+              }
+            }, '*');
+          }
+        });
+
+        // Request saved session from Figma main thread
+        parent.postMessage({ pluginMessage: { type: 'get-session' } }, '*');
         
         startPolling();
       } catch (e) {
@@ -504,16 +972,30 @@
       }
     });
 
-    // Handle view switching tabs
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active'));
-
-      document.getElementById(`tab-${tabId}`).classList.add('active');
-      document.getElementById(`view-${tabId}`).classList.add('active');
-
-      if (tabId === 'sync' && supabaseClient) {
-        fetchSessions();
+    // Toggle Settings view
+    function toggleSettings() {
+      showingSettings = !showingSettings;
+      const syncPane = document.getElementById('view-sync');
+      const settingsPane = document.getElementById('view-settings');
+      const gearIcon = document.querySelector('#settings-toggle-btn svg');
+      
+      if (showingSettings) {
+        syncPane.classList.remove('active');
+        settingsPane.classList.add('active');
+        if (gearIcon) {
+          gearIcon.style.transform = 'rotate(45deg)';
+          gearIcon.style.stroke = 'var(--color-brand)';
+        }
+      } else {
+        syncPane.classList.add('active');
+        settingsPane.classList.remove('active');
+        if (gearIcon) {
+          gearIcon.style.transform = 'rotate(0deg)';
+          gearIcon.style.stroke = '#555555';
+        }
+        if (supabaseClient) {
+          fetchSessions();
+        }
       }
     }
 
@@ -592,7 +1074,6 @@
         if (activeAuthMode === 'signin') {
           updateStatus("Signed in successfully!");
           updateAuthState(user);
-          switchTab('sync');
         } else {
           toggleAuthMode('signin');
           showAuthError("Account created successfully! Click the 'Sign In' button below to log in with your credentials.", true);
@@ -655,7 +1136,14 @@
       const emptyStateTitle = document.getElementById('empty-state-title');
       const emptyStateSubtitle = document.getElementById('empty-state-subtitle');
 
+      const mainAppContainer = document.getElementById('main-app-container');
+      const onboardingAuthContainer = document.getElementById('onboarding-auth-container');
+
       if (user) {
+        stopQrPolling();
+        mainAppContainer.style.display = 'flex';
+        onboardingAuthContainer.style.display = 'none';
+
         signedInNode.style.display = 'flex';
         signedOutNode.style.display = 'none';
         document.getElementById('auth-email-display').innerText = user.email;
@@ -664,9 +1152,26 @@
           emptyStateTitle.innerText = "No Flows Recorded Yet";
           emptyStateSubtitle.innerHTML = `Start recording a session on your phone under user email: <b>${user.email}</b>`;
         }
+
+        showingSettings = false;
+        document.getElementById('view-sync').classList.add('active');
+        document.getElementById('view-settings').classList.remove('active');
+        const gearIcon = document.querySelector('#settings-toggle-btn svg');
+        if (gearIcon) {
+          gearIcon.style.transform = 'rotate(0deg)';
+          gearIcon.style.stroke = '#555555';
+        }
         
         fetchSessions();
       } else {
+        mainAppContainer.style.display = 'none';
+        onboardingAuthContainer.style.display = 'flex';
+        
+        // Reset onboarding state
+        document.getElementById('onboarding-section').style.display = 'flex';
+        document.getElementById('login-section').style.display = 'none';
+        showSlide(1);
+
         signedInNode.style.display = 'none';
         signedOutNode.style.display = 'flex';
         
@@ -696,7 +1201,7 @@
       try {
         const { data, error } = await supabaseClient
           .from('sessions')
-          .select('*')
+          .select('*, screens(*)')
           .order('created_at', { ascending: false })
           .limit(10);
 
@@ -735,21 +1240,49 @@
       }
 
       sessionsList.forEach(session => {
-        const dateStr = new Date(session.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        
+        const dateObj = new Date(session.created_at);
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        const dateStr = `${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
+
+        // Sort screens by sequence_index
+        const sortedScreens = (session.screens || []).sort((a, b) => a.sequence_index - b.sequence_index);
+
+        // Determine images for the tilted stack
+        let backLeftHtml = `<div class="mock-placeholder"></div>`;
+        let backRightHtml = `<div class="mock-placeholder"></div>`;
+        let frontCenterHtml = `<div class="mock-placeholder-brand"></div>`;
+
+        if (sortedScreens.length === 1) {
+          frontCenterHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[0].image_url)}" alt="Screen" />`;
+        } else if (sortedScreens.length === 2) {
+          backLeftHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[0].image_url)}" alt="Screen" />`;
+          frontCenterHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[1].image_url)}" alt="Screen" />`;
+        } else if (sortedScreens.length >= 3) {
+          backLeftHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[0].image_url)}" alt="Screen" />`;
+          frontCenterHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[1].image_url)}" alt="Screen" />`;
+          backRightHtml = `<img class="mock-screenshot" src="${escapeHtml(sortedScreens[sortedScreens.length - 1].image_url)}" alt="Screen" />`;
+        }
+
         const card = document.createElement('div');
-        card.className = 'session-item';
+        card.className = 'session-card';
         card.onclick = () => handleSessionClick(session);
 
         card.innerHTML = `
-          <div class="session-meta">
-            <div class="session-name">${escapeHtml(session.flow_name)}</div>
-            <span class="badge ${session.status}">${session.status}</span>
+          <div class="card-visual-block">
+            <div class="screen-tilted-stack">
+              <div class="mock-phone back-left">
+                ${backLeftHtml}
+              </div>
+              <div class="mock-phone back-right">
+                ${backRightHtml}
+              </div>
+              <div class="mock-phone front-center">
+                ${frontCenterHtml}
+              </div>
+            </div>
           </div>
-          <div class="session-details">
-            <div>Device: <b>${escapeHtml(session.device_model || 'Unknown')}</b></div>
-            <div>Date: <b>${dateStr}</b></div>
-          </div>
+          <div class="card-flow-name">${escapeHtml(session.flow_name)}</div>
+          <div class="card-date">${dateStr}</div>
         `;
 
         container.appendChild(card);
@@ -912,6 +1445,27 @@
     window.onmessage = async (event) => {
       const msg = event.data.pluginMessage;
       if (!msg) return;
+
+      if (msg.type === 'restore-session') {
+        const session = msg.session;
+        if (session) {
+          try {
+            updateStatus("Restoring session...");
+            const { data, error } = await supabaseClient.auth.setSession({
+              access_token: session.access_token,
+              refresh_token: session.refresh_token
+            });
+            if (error) throw error;
+            updateAuthState(data.user);
+          } catch (restoreErr) {
+            console.error("Failed to restore session:", restoreErr);
+            parent.postMessage({ pluginMessage: { type: 'clear-session' } }, '*');
+            updateAuthState(null);
+          }
+        } else {
+          updateAuthState(null);
+        }
+      }
 
       if (msg.type === 'success' || msg.type === 'status') {
         updateStatus(msg.message);

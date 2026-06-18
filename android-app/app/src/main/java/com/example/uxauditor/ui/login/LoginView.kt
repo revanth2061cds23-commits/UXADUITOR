@@ -147,11 +147,12 @@ fun LoginScreen(
                                         } else {
                                             val json = JSONObject(resString)
                                             val token = json.getString("access_token")
+                                            val refreshToken = json.optString("refresh_token", "")
                                             val userObj = json.getJSONObject("user")
                                             val uuid = userObj.getString("id")
 
-                                            // Persist user token and UUID locally
-                                            prefs.saveAuth(token, uuid, email)
+                                            // Persist user token, refresh token, and UUID locally
+                                            prefs.saveAuth(token, refreshToken, uuid, email)
                                             onLoginSuccess()
                                         }
                                     }

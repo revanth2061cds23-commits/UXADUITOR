@@ -47,14 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Update display state based on login status
 function updateAuthUI(user) {
-  const authPanel = document.getElementById('auth-panel');
+  const authPanelWrapper = document.getElementById('auth-panel-wrapper');
   const mainDashboard = document.getElementById('main-dashboard');
   const headerStatusDot = document.getElementById('header-status-dot');
   const headerStatusText = document.getElementById('header-status-text');
 
   if (user) {
     // Logged In
-    authPanel.style.display = 'none';
+    stopWebQrPolling();
+    authPanelWrapper.style.display = 'none';
     mainDashboard.style.display = 'grid';
     document.getElementById('user-email-display').innerText = user.email;
     
@@ -63,11 +64,15 @@ function updateAuthUI(user) {
     logStatus("Signed in as " + user.email);
   } else {
     // Logged Out
-    authPanel.style.display = 'block';
+    authPanelWrapper.style.display = 'grid';
     mainDashboard.style.display = 'none';
     
     headerStatusDot.className = 'status-indicator-dot offline';
     headerStatusText.innerText = 'Disconnected';
+    
+    // Reset onboarding slider to first slide
+    showWebSlide(0);
+    switchAuthTab('signin');
     
     // Reset local data
     clearScreensQueue();
@@ -81,10 +86,21 @@ function switchAuthTab(mode) {
   activeAuthMode = mode;
   document.getElementById('tab-signin').classList.remove('active');
   document.getElementById('tab-signup').classList.remove('active');
+  document.getElementById('tab-qr').classList.remove('active');
   document.getElementById(`tab-${mode}`).classList.add('active');
   
-  document.getElementById('btn-auth').innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
   hideAuthAlert();
+  stopWebQrPolling();
+
+  if (mode === 'qr') {
+    document.getElementById('email-auth-inputs').style.display = 'none';
+    document.getElementById('web-qr-login-view').style.display = 'flex';
+    startWebQrPolling();
+  } else {
+    document.getElementById('web-qr-login-view').style.display = 'none';
+    document.getElementById('email-auth-inputs').style.display = 'block';
+    document.getElementById('btn-auth').innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
+  }
 }
 
 function showAuthAlert(msg, isSuccess = false) {
@@ -471,4 +487,205 @@ function updateProgress(pct, message) {
 
 function logStatus(msg) {
   document.getElementById('status-logger').innerText = msg;
+}
+
+// ----------------------------------
+// Web Onboarding Slide Logic
+// ----------------------------------
+let activeWebSlide = 0;
+
+function showWebSlide(slideIndex) {
+  const slides = document.querySelectorAll('.web-onboarding-slide');
+  const dots = document.querySelectorAll('.slide-dot');
+  if (slides.length === 0) return;
+
+  slides.forEach(s => s.classList.remove('active'));
+  dots.forEach(d => d.classList.remove('active'));
+
+  activeWebSlide = slideIndex;
+  slides[slideIndex].classList.add('active');
+  dots[slideIndex].classList.add('active');
+}
+
+// Auto transition slides every 4 seconds
+let onboardingInterval = setInterval(() => {
+  const slides = document.querySelectorAll('.web-onboarding-slide');
+  const wrapper = document.getElementById('auth-panel-wrapper');
+  if (slides.length > 0 && wrapper && wrapper.style.display !== 'none') {
+    const nextIdx = (activeWebSlide + 1) % slides.length;
+    showWebSlide(nextIdx);
+  }
+}, 4000);
+
+// ----------------------------------
+// Web QR Code Login (Polling)
+// ----------------------------------
+let webQrPollInterval = null;
+let webPairingToken = null;
+
+async function startWebQrPolling() {
+  stopWebQrPolling();
+  if (!supabaseClient) return;
+
+  document.getElementById('web-qr-code-img').style.display = 'none';
+  document.getElementById('web-qr-loading-spinner').style.display = 'block';
+  document.getElementById('web-qr-status').innerText = "Generating pairing token...";
+  document.getElementById('web-qr-status').style.color = "var(--color-text-muted)";
+
+  webPairingToken = crypto.randomUUID();
+
+  try {
+    const { error } = await supabaseClient
+      .from('qr_pairings')
+      .insert({
+        token: webPairingToken,
+        status: 'pending'
+      });
+
+    if (error) throw error;
+
+    const qrImg = document.getElementById('web-qr-code-img');
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${webPairingToken}`;
+    qrImg.onload = () => {
+      document.getElementById('web-qr-loading-spinner').style.display = 'none';
+      qrImg.style.display = 'block';
+      document.getElementById('web-qr-status').innerText = "Ready to scan";
+      document.getElementById('web-qr-status').style.color = "var(--color-brand)";
+    };
+
+    webQrPollInterval = setInterval(async () => {
+      if (!webPairingToken) return;
+
+      const { data, error: pollError } = await supabaseClient
+        .from('qr_pairings')
+        .select('*')
+        .eq('token', webPairingToken)
+        .maybeSingle();
+
+      if (pollError) {
+        console.error("Web QR polling error:", pollError);
+        return;
+      }
+
+      if (data && data.status === 'paired') {
+        stopWebQrPolling();
+        document.getElementById('web-qr-status').innerText = "Scanned! Logging in...";
+        document.getElementById('web-qr-status').style.color = "var(--color-success, #10b981)";
+
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token || ''
+        });
+
+        if (sessionError) {
+          showAuthAlert("Session synchronization failed: " + sessionError.message);
+          return;
+        }
+
+        await supabaseClient
+          .from('qr_pairings')
+          .delete()
+          .eq('token', data.token);
+      }
+    }, 2000);
+
+  } catch (err) {
+    console.error("Web QR login setup error:", err);
+    document.getElementById('web-qr-loading-spinner').style.display = 'none';
+    document.getElementById('web-qr-status').innerText = "Failed to load QR code";
+    document.getElementById('web-qr-status').style.color = "red";
+  }
+}
+
+function stopWebQrPolling() {
+  if (webQrPollInterval) {
+    clearInterval(webQrPollInterval);
+    webQrPollInterval = null;
+  }
+  webPairingToken = null;
+}
+
+// ----------------------------------
+// Mobile QR Scanner Camera Interface
+// ----------------------------------
+let html5QrScanner = null;
+
+function openScanner() {
+  document.getElementById('scanner-modal').style.display = 'flex';
+  document.getElementById('scanner-status-text').innerText = "Accessing camera...";
+  document.getElementById('scanner-status-text').style.color = "var(--color-text-muted)";
+
+  html5QrScanner = new Html5Qrcode("qr-reader");
+
+  html5QrScanner.start(
+    { facingMode: "environment" },
+    {
+      fps: 10,
+      qrbox: { width: 220, height: 220 }
+    },
+    async (decodedText, decodedResult) => {
+      console.log("Scanned QR Text:", decodedText);
+      document.getElementById('scanner-status-text').innerText = "Code scanned! Linking...";
+      document.getElementById('scanner-status-text').style.color = "var(--color-brand)";
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(decodedText.trim())) {
+        document.getElementById('scanner-status-text').innerText = "Invalid QR code format.";
+        document.getElementById('scanner-status-text').style.color = "var(--color-error)";
+        return;
+      }
+
+      try {
+        await closeScanner();
+
+        const session = (await supabaseClient.auth.getSession()).data.session;
+        if (!session) {
+          alert("Your session has expired. Please log in again.");
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from('qr_pairings')
+          .update({
+            status: 'paired',
+            user_id: session.user.id,
+            email: session.user.email,
+            access_token: session.access_token,
+            refresh_token: session.refresh_token
+          })
+          .eq('token', decodedText.trim());
+
+        if (error) throw error;
+
+        alert("🎉 Device paired successfully! The desktop device should log in instantly.");
+
+      } catch (pairErr) {
+        console.error("Pairing failed:", pairErr);
+        alert("Pairing failed: " + (pairErr.message || pairErr));
+      }
+    },
+    (errorMessage) => {
+      // Scan failure callback
+    }
+  ).then(() => {
+    document.getElementById('scanner-status-text').innerText = "Position QR code within the frame";
+  }).catch(err => {
+    console.error("Failed to start camera scanner:", err);
+    document.getElementById('scanner-status-text').innerText = "Camera Access Error: " + err;
+    document.getElementById('scanner-status-text').style.color = "var(--color-error)";
+  });
+}
+
+async function closeScanner() {
+  if (html5QrScanner) {
+    try {
+      if (html5QrScanner.isScanning) {
+        await html5QrScanner.stop();
+      }
+    } catch (err) {
+      console.error("Error stopping scanner:", err);
+    }
+    html5QrScanner = null;
+  }
+  document.getElementById('scanner-modal').style.display = 'none';
 }

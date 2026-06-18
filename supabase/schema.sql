@@ -109,3 +109,36 @@ begin;
   -- Add sessions to publication to broadcast status updates ('active' -> 'uploading' -> 'complete')
   alter publication supabase_realtime add table public.sessions;
 commit;
+
+-- ==========================================
+-- 7. QR Code pairing sessions for authentication pairing
+-- ==========================================
+create table if not exists public.qr_pairings (
+    token uuid primary key default gen_random_uuid(),
+    status varchar(50) default 'pending' check (status in ('pending', 'paired')),
+    user_id uuid references auth.users(id) on delete cascade,
+    email text,
+    access_token text,
+    refresh_token text,
+    created_at timestamptz default current_timestamp
+);
+
+alter table public.qr_pairings enable row level security;
+
+-- 1. Anyone (public/anon) can insert a new pairing request
+create policy "Allow public to insert pairing request" on public.qr_pairings
+    for insert to public with check (
+        status = 'pending' and user_id is null and access_token is null and refresh_token is null
+    );
+
+-- 2. Anyone can read a pairing request by its token (anonymous check)
+create policy "Allow public to read pairing request by token" on public.qr_pairings
+    for select to public using ( true );
+
+-- 3. Authenticated mobile apps can complete the pairing by updating the row
+create policy "Allow authenticated users to pair session" on public.qr_pairings
+    for update to authenticated using ( status = 'pending' );
+
+-- 4. Anyone can delete a pairing request to clean it up after matching
+create policy "Allow public to delete pairing request" on public.qr_pairings
+    for delete to public using ( true );

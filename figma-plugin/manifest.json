@@ -9,7 +9,8 @@
   ],
   "networkAccess": {
     "allowedDomains": [
-      "https://naneeovpzwyfnbaaujpi.supabase.co"
+      "https://naneeovpzwyfnbaaujpi.supabase.co",
+      "https://api.qrserver.com"
     ]
   },
   "documentAccess": "dynamic-page"

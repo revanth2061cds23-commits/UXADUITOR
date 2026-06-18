@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +25,17 @@ import androidx.compose.ui.unit.sp
 import com.example.uxauditor.data.DatabaseHelper
 import com.example.uxauditor.data.SharedPreferencesHelper
 import com.example.uxauditor.services.CaptureService
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.barcode.common.Barcode
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +47,7 @@ fun MainScreen(
     onSignOut: () -> Unit
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var flowName by remember { mutableStateOf("") }
     var pastSessions by remember { mutableStateOf(listOf<LocalSessionData>()) }
     val db = remember { DatabaseHelper(context) }
@@ -88,6 +101,84 @@ fun MainScreen(
             TopAppBar(
                 title = { Text("UX Auditor Dashboard", fontWeight = FontWeight.Bold) },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            val options = GmsBarcodeScannerOptions.Builder()
+                                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                                .build()
+                            val scanner = GmsBarcodeScanning.getClient(context, options)
+                            
+                            scanner.startScan()
+                                .addOnSuccessListener { barcode ->
+                                    val scannedToken = barcode.rawValue ?: ""
+                                    if (scannedToken.isEmpty()) return@addOnSuccessListener
+                                    
+                                    try {
+                                        UUID.fromString(scannedToken)
+                                    } catch (e: IllegalArgumentException) {
+                                        Toast.makeText(context, "Invalid QR code format.", Toast.LENGTH_SHORT).show()
+                                        return@addOnSuccessListener
+                                    }
+                                    
+                                    val token = prefs.getAuthToken()
+                                    val refreshToken = prefs.getRefreshToken() ?: ""
+                                    val userUuid = prefs.getUserUuid()
+                                    val email = prefs.getUserEmail()
+                                    val url = "https://naneeovpzwyfnbaaujpi.supabase.co"
+                                    val anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbmVlb3Zwend5Zm5iYWF1anBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTYwMzIsImV4cCI6MjA5NTc3MjAzMn0.Ilb6N52RvkwpiQ8iI0vGpIvDOysNgkubzXFh5sSUoUk"
+                                    
+                                    if (token == null || userUuid == null) {
+                                        Toast.makeText(context, "Please sign in again on your phone.", Toast.LENGTH_SHORT).show()
+                                        return@addOnSuccessListener
+                                    }
+
+                                    Toast.makeText(context, "Linking device...", Toast.LENGTH_SHORT).show()
+
+                                    coroutineScope.launch(Dispatchers.IO) {
+                                        val client = OkHttpClient()
+                                        val mediaType = "application/json".toMediaType()
+                                        val payload = JSONObject().apply {
+                                            put("status", "paired")
+                                            put("user_id", userUuid)
+                                            put("email", email)
+                                            put("access_token", token)
+                                            put("refresh_token", refreshToken)
+                                        }
+
+                                        val req = Request.Builder()
+                                            .url("${url}/rest/v1/qr_pairings?token=eq.${scannedToken}")
+                                            .patch(payload.toString().toRequestBody(mediaType))
+                                            .addHeader("apikey", anonKey)
+                                            .addHeader("Authorization", "Bearer ${token}")
+                                            .build()
+
+                                        try {
+                                            client.newCall(req).execute().use { response ->
+                                                withContext(Dispatchers.Main) {
+                                                    if (response.isSuccessful) {
+                                                        Toast.makeText(context, "Device paired successfully!", Toast.LENGTH_LONG).show()
+                                                    } else {
+                                                        val err = response.body?.string() ?: ""
+                                                        Toast.makeText(context, "Pairing failed: ${response.code}", Toast.LENGTH_LONG).show()
+                                                        Log.e("QRScanner", "Pairing failed response: $err")
+                                                    }
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "Network Error: ${e.message}", Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(context, "Scanner failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("Pair", color = Color(0xFF007AFF), fontWeight = FontWeight.Bold)
+                    }
                     IconButton(onClick = onSignOut) {
                         Text("Exit", color = Color(0xFFE63525), fontWeight = FontWeight.Bold)
                     }
