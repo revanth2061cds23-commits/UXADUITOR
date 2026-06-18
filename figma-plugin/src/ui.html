@@ -551,16 +551,16 @@
   </div> <!-- #main-app-container -->
 
   <!-- Onboarding & Auth View -->
-  <div id="onboarding-auth-container" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between; overflow: hidden; background: #FFFFFF;">
+  <div id="onboarding-auth-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; height: 100%; width: 100%; justify-content: space-between; overflow: hidden; background: #FFFFFF; z-index: 9999; box-sizing: border-box;">
     
     <!-- Onboarding Intro Screen -->
     <div id="onboarding-intro" style="display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; box-sizing: border-box; overflow: hidden; align-items: center; justify-content: flex-start; background: #FFFFFF;">
       <img id="intro-mockup-img" src="INTRO_MOCKUP_BASE64_PLACEHOLDER" style="width: 100%; height: 100%; object-fit: contain; display: block;" alt="Intro" />
-      <button onclick="startOnboardingSlides()" style="position: absolute; bottom: 30px; left: 24px; right: 24px; background: #000000; color: #FFFFFF; font-family: var(--font-sans); font-weight: 600; border-radius: 10px; padding: 12px 20px; font-size: 13px; border: none; cursor: pointer; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background 0.2s ease;">Start syncing</button>
+      <button onclick="startOnboardingSlides()" style="position: absolute; bottom: 40px; left: 24px; right: 24px; background: #000000; color: #FFFFFF; font-family: var(--font-sans); font-weight: 600; border-radius: 8px; padding: 14px 20px; font-size: 13px; border: none; cursor: pointer; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background 0.2s ease;">Start syncing</button>
     </div>
 
     <!-- Onboarding Section -->
-    <div id="onboarding-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0; overflow-y: auto;">
+    <div id="onboarding-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; overflow-y: auto; box-sizing: border-box; height: 100%;">
       
       <!-- Logo & Header -->
       <div class="logo-container" style="justify-content: center; margin-bottom: 24px;">
@@ -614,7 +614,7 @@
     </div>
 
     <!-- Login Section -->
-    <div id="login-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0;">
+    <div id="login-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; box-sizing: border-box; height: 100%; overflow-y: auto;">
       <div class="logo-container" style="justify-content: center; margin-bottom: 16px;">
         <div class="logo-dot"></div>
         <div class="logo-text" style="font-size: 16px;">Sync Screen</div>
