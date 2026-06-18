@@ -20,9 +20,9 @@
       --font-mono: 'JetBrains Mono', monospace;
       
       /* Vibrant harmonious colors */
-      --color-brand: #E63525;          /* Surgical Accent Red */
-      --color-brand-hover: #C5291C;
-      --color-bg: var(--figma-color-bg, #FFFFFF);
+      --color-brand: #97BDFF;          /* Premium Accent Pastel Blue */
+      --color-brand-hover: #7EABF2;
+      --color-bg: #FFFFFF;             /* Force pure white background */
       --color-text: var(--figma-color-text, #333333);
       --color-border: var(--figma-color-border, #E5E5E5);
       --color-surface: var(--figma-color-bg-secondary, #F9F9F9);
@@ -471,7 +471,7 @@
     </div>
 
     <!-- Active Canvas Controls -->
-    <div class="controls-panel" style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="controls-panel" id="taps-controls-panel" style="display: none; flex-direction: column; gap: 8px;">
       <div class="toggle-row" style="padding: 4px 0;">
         <div>
           <div style="font-weight: 600; font-size: 11px;">Show Tap Overlays</div>
@@ -1161,6 +1161,10 @@
           gearIcon.style.transform = 'rotate(0deg)';
           gearIcon.style.stroke = '#555555';
         }
+        const controlsPanel = document.getElementById('taps-controls-panel');
+        if (controlsPanel) {
+          controlsPanel.style.display = 'none';
+        }
         
         fetchSessions();
       } else {
@@ -1178,6 +1182,10 @@
         if (emptyStateTitle) {
           emptyStateTitle.innerText = "Sign-In Required";
           emptyStateSubtitle.innerText = "Please Sign In under the Settings tab to access your audit flows.";
+        }
+        const controlsPanel = document.getElementById('taps-controls-panel');
+        if (controlsPanel) {
+          controlsPanel.style.display = 'none';
         }
         
         sessionsList = [];
@@ -1319,6 +1327,13 @@
           updateStatus("No screens found in this session.");
           showProgressBar(false);
           return;
+        }
+
+        // Show/hide taps controls panel depending on whether the flow contains tap hotspots
+        const hasTaps = screens.some(s => s.tap_x_pct !== null && s.tap_x_pct !== undefined && parseFloat(s.tap_x_pct) >= 0 && s.tap_y_pct !== null && s.tap_y_pct !== undefined && parseFloat(s.tap_y_pct) >= 0);
+        const controlsPanel = document.getElementById('taps-controls-panel');
+        if (controlsPanel) {
+          controlsPanel.style.display = hasTaps ? 'flex' : 'none';
         }
 
         setProgressBar(25);
