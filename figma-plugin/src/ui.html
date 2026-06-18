@@ -23,10 +23,10 @@
       --color-brand: #97BDFF;          /* Premium Accent Pastel Blue */
       --color-brand-hover: #7EABF2;
       --color-bg: #FFFFFF;             /* Force pure white background */
-      --color-text: var(--figma-color-text, #333333);
-      --color-border: var(--figma-color-border, #E5E5E5);
-      --color-surface: var(--figma-color-bg-secondary, #F9F9F9);
-      --color-text-muted: var(--figma-color-text-secondary, #777777);
+      --color-text: #333333;           /* Force light mode text color */
+      --color-border: #E5E5E5;         /* Force light mode border color */
+      --color-surface: #F9F9F9;        /* Force light mode surface color */
+      --color-text-muted: #777777;     /* Force light mode muted text color */
       
       --radius: 6px;
       --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -158,7 +158,7 @@
       font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 600;
-      color: #FFFFFF;
+      color: #101F42;                  /* High-contrast dark text on light blue button */
       background-color: var(--color-brand);
       border-radius: var(--radius);
       cursor: pointer;
