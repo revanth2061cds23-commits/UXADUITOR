@@ -6,6 +6,18 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+// Safe offline UUIDv4 generator fallback for sandboxed/non-secure HTTP environments where crypto.randomUUID is not available
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 // ----------------------------------
 // Global App States
 // ----------------------------------
@@ -190,7 +202,7 @@ function processFiles(filesList) {
 
     const blobUrl = URL.createObjectURL(file);
     const screenItem = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       file: file,
       blobUrl: blobUrl,
       sequenceIndex: screensList.length,
@@ -367,7 +379,7 @@ async function syncFlowToSupabase() {
   flowNameInput.disabled = true;
   showProgress(true);
   
-  const sessionId = crypto.randomUUID();
+  const sessionId = generateUUID();
   const userUuid = currentUser.id;
   const headerStatusDot = document.getElementById('header-status-dot');
   
@@ -532,7 +544,7 @@ async function startWebQrPolling() {
   document.getElementById('web-qr-status').innerText = "Generating pairing token...";
   document.getElementById('web-qr-status').style.color = "var(--color-text-muted)";
 
-  webPairingToken = crypto.randomUUID();
+  webPairingToken = generateUUID();
 
   try {
     const { error } = await supabaseClient

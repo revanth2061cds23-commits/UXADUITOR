@@ -17,6 +17,23 @@ const localSupabase = path.join(srcDir, 'supabase.min.js');
 function buildUI(supabaseCode) {
     if (fs.existsSync(srcUI)) {
         let html = fs.readFileSync(srcUI, 'utf8');
+
+        // Inline the intro mockup image in base64 format
+        const introImg = path.join(srcDir, 'intro-mockup.png');
+        if (fs.existsSync(introImg)) {
+            const imgData = fs.readFileSync(introImg);
+            const base64Str = imgData.toString('base64');
+            const dataUrl = `data:image/png;base64,${base64Str}`;
+            if (html.includes('INTRO_MOCKUP_BASE64_PLACEHOLDER')) {
+                html = html.replace('INTRO_MOCKUP_BASE64_PLACEHOLDER', dataUrl);
+                console.log('Inlined intro mockup image in base64 format.');
+            } else {
+                console.warn('Warning: INTRO_MOCKUP_BASE64_PLACEHOLDER not found in ui.html.');
+            }
+        } else {
+            console.warn('Warning: intro-mockup.png does not exist. Skipping image inlining.');
+        }
+
         // Replace script tag with inline supabase code
         const targetTag = '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>';
         if (html.includes(targetTag)) {
@@ -26,7 +43,7 @@ function buildUI(supabaseCode) {
             console.warn('Warning: Could not find external Supabase script tag to inline in ui.html.');
         }
         fs.writeFileSync(distUI, html, 'utf8');
-        console.log('Successfully copied ui.html to dist/ui.html');
+        console.log('Successfully compiled ui.html to dist/ui.html');
     } else {
         console.error('Error: src/ui.html does not exist!');
     }

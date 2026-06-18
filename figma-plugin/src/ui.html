@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Sync Screen</title>
   <!-- Modern Typographic Foundation -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
   <!-- Supabase JS Client library via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
   <style>
     /* ---------------------------------- */
     /* Swiss Minimal Premium Style System */
@@ -18,16 +21,22 @@
     :root {
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
-      
+
       /* Vibrant harmonious colors */
-      --color-brand: #97BDFF;          /* Premium Accent Pastel Blue */
+      --color-brand: #97BDFF;
+      /* Premium Accent Pastel Blue */
       --color-brand-hover: #7EABF2;
-      --color-bg: #FFFFFF;             /* Force pure white background */
-      --color-text: #333333;           /* Force light mode text color */
-      --color-border: #E5E5E5;         /* Force light mode border color */
-      --color-surface: #F9F9F9;        /* Force light mode surface color */
-      --color-text-muted: #777777;     /* Force light mode muted text color */
-      
+      --color-bg: #FFFFFF;
+      /* Force pure white background */
+      --color-text: #333333;
+      /* Force light mode text color */
+      --color-border: #E5E5E5;
+      /* Force light mode border color */
+      --color-surface: #F9F9F9;
+      /* Force light mode surface color */
+      --color-text-muted: #777777;
+      /* Force light mode muted text color */
+
       --radius: 6px;
       --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -102,7 +111,7 @@
     .tab-btn.active {
       background: var(--color-bg);
       color: var(--color-text);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     /* Views */
@@ -158,7 +167,8 @@
       font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 600;
-      color: #101F42;                  /* High-contrast dark text on light blue button */
+      color: #101F42;
+      /* High-contrast dark text on light blue button */
       background-color: var(--color-brand);
       border-radius: var(--radius);
       cursor: pointer;
@@ -191,7 +201,8 @@
     }
 
     .session-card {
-      background: #FAF6F6; /* Soft warm light gray/pink background matching the uploaded design */
+      background: #FAF6F6;
+      /* Soft warm light gray/pink background matching the uploaded design */
       border-radius: 14px;
       padding: 10px;
       display: flex;
@@ -208,13 +219,14 @@
     .session-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-      border-color: rgba(151, 189, 255, 0.3);
+      border-color: rgba(230, 53, 37, 0.15);
     }
 
     .card-visual-block {
       width: 100%;
       height: 90px;
-      background: #CCCCCC; /* Gray rounded container matching mockup */
+      background: #CCCCCC;
+      /* Gray rounded container matching mockup */
       border-radius: 10px;
       display: flex;
       justify-content: center;
@@ -231,6 +243,8 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
+      perspective: 800px;
+      transform-style: preserve-3d;
     }
 
     .mock-phone {
@@ -250,19 +264,21 @@
     }
 
     .mock-phone.back-left {
-      transform: rotate(-12deg) translate(-18px, -4px) scale(0.9);
+      transform: translate3d(-18px, -4px, -20px) rotateY(20deg) rotate(-12deg) scale(0.9);
+      transform-origin: bottom center;
       z-index: 1;
       opacity: 0.8;
     }
 
     .mock-phone.back-right {
-      transform: rotate(12deg) translate(18px, -4px) scale(0.9);
+      transform: translate3d(18px, -4px, -20px) rotateY(-20deg) rotate(12deg) scale(0.9);
+      transform-origin: bottom center;
       z-index: 2;
       opacity: 0.8;
     }
 
     .mock-phone.front-center {
-      transform: translate(0, 4px) scale(1.05);
+      transform: translate3d(0, 4px, 10px) scale(1.05);
       z-index: 3;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
@@ -285,7 +301,7 @@
     .mock-placeholder-brand {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #E0ECFF, #97BDFF);
+      background: linear-gradient(135deg, #FF6F61, #E63525);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -294,7 +310,8 @@
     .card-flow-name {
       font-weight: 700;
       font-size: 12px;
-      color: #101F42; /* Brand dark blue matching mockup */
+      color: #101F42;
+      /* Brand dark blue matching mockup */
       text-align: center;
       margin-bottom: 2px;
       width: 100%;
@@ -359,7 +376,10 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background-color: var(--color-border);
       transition: .2s;
       border-radius: 16px;
@@ -368,18 +388,20 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 12px; width: 12px;
-      left: 2px; bottom: 2px;
+      height: 12px;
+      width: 12px;
+      left: 2px;
+      bottom: 2px;
       background-color: white;
       transition: .2s;
       border-radius: 50%;
     }
 
-    input:checked + .slider {
+    input:checked+.slider {
       background-color: var(--color-brand);
     }
 
-    input:checked + .slider:before {
+    input:checked+.slider:before {
       transform: translateX(12px);
     }
 
@@ -411,23 +433,49 @@
 
     /* Animations */
     @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
+      0% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.4;
+      }
     }
 
     @keyframes blink {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
+      0% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.5;
+      }
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     #settings-toggle-btn svg {
@@ -437,131 +485,162 @@
     ::-webkit-scrollbar {
       width: 4px;
     }
+
     ::-webkit-scrollbar-thumb {
       background: var(--color-border);
       border-radius: 2px;
     }
   </style>
 </head>
+
 <body>
   <div id="main-app-container" style="display: none; flex-direction: column; height: 100%;">
     <!-- Header Section -->
-    <div class="header" style="border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+    <div class="header"
+      style="border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
       <div style="font-size: 16px; font-weight: 700; color: #101F42; font-family: var(--font-sans);">Sync Screens.</div>
-      <div id="settings-toggle-btn" onclick="toggleSettings()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div id="settings-toggle-btn" onclick="toggleSettings()"
+        style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+          </path>
         </svg>
       </div>
     </div>
 
-  <!-- VIEW: SYNC DASHBOARD -->
-  <div class="view-pane active" id="view-sync">
-    <!-- User Sessions List -->
-    <div class="session-list" id="session-list-container">
-      <!-- Session cards will render dynamically here -->
-      <div class="empty-state">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <span style="font-weight: 500; font-size: 11px;" id="empty-state-title">Connection & Sign-In Required</span>
-        <span style="font-size: 9px; margin-top: 4px;" id="empty-state-subtitle">Please set up your Supabase credentials and Sign In under the Settings tab.</span>
-      </div>
-    </div>
-
-    <!-- Active Canvas Controls -->
-    <div class="controls-panel" id="taps-controls-panel" style="display: none; flex-direction: column; gap: 8px;">
-      <div class="toggle-row" style="padding: 4px 0;">
-        <div>
-          <div style="font-weight: 600; font-size: 11px;">Show Tap Overlays</div>
-          <div style="font-size: 9px; color: var(--color-text-muted);">Toggles overlay indicator layers inside Figma</div>
+    <!-- VIEW: SYNC DASHBOARD -->
+    <div class="view-pane active" id="view-sync">
+      <!-- User Sessions List -->
+      <div class="session-list" id="session-list-container">
+        <!-- Session cards will render dynamically here -->
+        <div class="empty-state">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span style="font-weight: 500; font-size: 11px;" id="empty-state-title">Connection & Sign-In Required</span>
+          <span style="font-size: 9px; margin-top: 4px;" id="empty-state-subtitle">Please set up your Supabase
+            credentials and Sign In under the Settings tab.</span>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="toggle-indicators-chk" checked onchange="handleIndicatorToggle()">
-          <span class="slider"></span>
-        </label>
       </div>
 
-      <!-- Tap Size Slider Control -->
-      <div class="toggle-row" style="padding: 4px 0; display: flex; flex-direction: column; align-items: stretch; gap: 6px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <!-- Active Canvas Controls -->
+      <div class="controls-panel" id="taps-controls-panel" style="display: none; flex-direction: column; gap: 8px;">
+        <div class="toggle-row" style="padding: 4px 0;">
           <div>
-            <div style="font-weight: 600; font-size: 11px;">Tap Overlay Size</div>
-            <div style="font-size: 9px; color: var(--color-text-muted);">Adjusts the width/height of hotspots</div>
+            <div style="font-weight: 600; font-size: 11px;">Show Tap Overlays</div>
+            <div style="font-size: 9px; color: var(--color-text-muted);">Toggles overlay indicator layers inside Figma
+            </div>
           </div>
-          <div style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--color-brand);" id="tap-size-display">48px</div>
-        </div>
-        <input type="range" id="tap-size-slider" min="24" max="80" value="48" style="width: 100%; height: 4px; background: var(--color-border); border-radius: 2px; -webkit-appearance: none; appearance: none; cursor: pointer; outline: none; accent-color: var(--color-brand);" oninput="updateTapSizeDisplay(this.value)">
-      </div>
-    </div>
-
-    <!-- Progress & Status indicator -->
-    <div class="progress-bar-container" id="sync-progress-container">
-      <div class="progress-bar-fill" id="sync-progress-fill"></div>
-    </div>
-    <div class="status-msg" id="status-message">Ready</div>
-  </div>
-
-  <!-- VIEW: SETTINGS -->
-  <div class="view-pane" id="view-settings">
-    <div style="flex: 1; overflow-y: auto; padding-right: 2px; display: flex; flex-direction: column; gap: 14px;">
-      
-      <!-- Unified Account Authentication -->
-      <div id="auth-section-container" style="border: 1px solid var(--color-border); border-radius: var(--radius); padding: 12px;">
-        <div style="font-weight: 600; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">Account Authentication</div>
-        
-        <!-- Signed In State -->
-        <div id="auth-signed-in" style="display: none; flex-direction: column; gap: 8px;">
-          <div style="font-size: 12px; color: var(--color-text);">Signed in as: <b id="auth-email-display">user@example.com</b></div>
-          <button class="btn" style="background-color: #555; padding: 6px 12px; font-size: 11px;" onclick="handleSignOut()">Sign Out</button>
+          <label class="switch">
+            <input type="checkbox" id="toggle-indicators-chk" checked onchange="handleIndicatorToggle()">
+            <span class="slider"></span>
+          </label>
         </div>
 
-        <!-- Signed Out State -->
-        <div id="auth-signed-out" style="display: flex; flex-direction: column; gap: 10px;">
-          <!-- Segmented Login/Signup Control -->
-          <div style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius);">
-            <button id="auth-toggle-signin" class="tab-btn active" style="padding: 4px;" onclick="toggleAuthMode('signin')">Sign In</button>
-            <button id="auth-toggle-signup" class="tab-btn" style="padding: 4px;" onclick="toggleAuthMode('signup')">Sign Up</button>
+        <!-- Tap Size Slider Control -->
+        <div class="toggle-row"
+          style="padding: 4px 0; display: flex; flex-direction: column; align-items: stretch; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+              <div style="font-weight: 600; font-size: 11px;">Tap Overlay Size</div>
+              <div style="font-size: 9px; color: var(--color-text-muted);">Adjusts the width/height of hotspots</div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--color-brand);"
+              id="tap-size-display">48px</div>
           </div>
-
-          <!-- Inline Error Alert Banner -->
-          <div id="auth-error-message" style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;"></div>
-
-          <div class="form-group" style="margin-bottom: 4px;">
-            <label for="input-email">Email Address</label>
-            <input type="email" id="input-email" placeholder="you@example.com" />
-          </div>
-
-          <div class="form-group" style="margin-bottom: 4px;">
-            <label for="input-password">Password</label>
-            <input type="password" id="input-password" placeholder="••••••••" />
-          </div>
-
-          <!-- Forgot Password Link -->
-          <div id="forgot-password-container" style="display: flex; justify-content: flex-end; margin-top: -4px; margin-bottom: 4px;">
-            <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;" onclick="handleForgotPassword()">Forgot Password?</span>
-          </div>
-
-          <button class="btn" id="btn-auth-action" onclick="handleAuthAction()">Sign In</button>
+          <input type="range" id="tap-size-slider" min="24" max="80" value="48"
+            style="width: 100%; height: 4px; background: var(--color-border); border-radius: 2px; -webkit-appearance: none; appearance: none; cursor: pointer; outline: none; accent-color: var(--color-brand);"
+            oninput="updateTapSizeDisplay(this.value)">
         </div>
       </div>
+
+      <!-- Progress & Status indicator -->
+      <div class="progress-bar-container" id="sync-progress-container">
+        <div class="progress-bar-fill" id="sync-progress-fill"></div>
+      </div>
+      <div class="status-msg" id="status-message">Ready</div>
     </div>
-  </div>
+
+    <!-- VIEW: SETTINGS -->
+    <div class="view-pane" id="view-settings">
+      <div style="flex: 1; overflow-y: auto; padding-right: 2px; display: flex; flex-direction: column; gap: 14px;">
+
+        <!-- Unified Account Authentication -->
+        <div id="auth-section-container"
+          style="border: 1px solid var(--color-border); border-radius: var(--radius); padding: 12px;">
+          <div
+            style="font-weight: 600; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">
+            Account Authentication</div>
+
+          <!-- Signed In State -->
+          <div id="auth-signed-in" style="display: none; flex-direction: column; gap: 8px;">
+            <div style="font-size: 12px; color: var(--color-text);">Signed in as: <b
+                id="auth-email-display">user@example.com</b></div>
+            <button class="btn" style="background-color: #555; padding: 6px 12px; font-size: 11px;"
+              onclick="handleSignOut()">Sign Out</button>
+          </div>
+
+          <!-- Signed Out State -->
+          <div id="auth-signed-out" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Segmented Login/Signup Control -->
+            <div style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius);">
+              <button id="auth-toggle-signin" class="tab-btn active" style="padding: 4px;"
+                onclick="toggleAuthMode('signin')">Sign In</button>
+              <button id="auth-toggle-signup" class="tab-btn" style="padding: 4px;"
+                onclick="toggleAuthMode('signup')">Sign Up</button>
+            </div>
+
+            <!-- Inline Error Alert Banner -->
+            <div id="auth-error-message"
+              style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label for="input-email">Email Address</label>
+              <input type="email" id="input-email" placeholder="you@example.com" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label for="input-password">Password</label>
+              <input type="password" id="input-password" placeholder="••••••••" />
+            </div>
+
+            <!-- Forgot Password Link -->
+            <div id="forgot-password-container"
+              style="display: flex; justify-content: flex-end; margin-top: -4px; margin-bottom: 4px;">
+              <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;"
+                onclick="handleForgotPassword()">Forgot Password?</span>
+            </div>
+
+            <button class="btn" id="btn-auth-action" onclick="handleAuthAction()">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div> <!-- #main-app-container -->
 
   <!-- Onboarding & Auth View -->
-  <div id="onboarding-auth-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; height: 100%; width: 100%; justify-content: space-between; overflow: hidden; background: #FFFFFF; z-index: 9999; box-sizing: border-box;">
-    
+  <div id="onboarding-auth-container"
+    style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; height: 100%; width: 100%; justify-content: space-between; overflow: hidden; background: #FFFFFF; z-index: 9999; box-sizing: border-box;">
+
     <!-- Onboarding Intro Screen -->
-    <div id="onboarding-intro" style="display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; box-sizing: border-box; overflow: hidden; align-items: center; justify-content: flex-start; background: #FFFFFF;">
-      <img id="intro-mockup-img" src="INTRO_MOCKUP_BASE64_PLACEHOLDER" style="width: 100%; height: 100%; object-fit: contain; display: block;" alt="Intro" />
-      <button onclick="startOnboardingSlides()" style="position: absolute; bottom: 40px; left: 24px; right: 24px; background: #000000; color: #FFFFFF; font-family: var(--font-sans); font-weight: 600; border-radius: 8px; padding: 14px 20px; font-size: 13px; border: none; cursor: pointer; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background 0.2s ease;">Start syncing</button>
+    <div id="onboarding-intro"
+      style="display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; box-sizing: border-box; overflow: hidden; align-items: center; justify-content: flex-start; background: #FFFFFF;">
+      <img id="intro-mockup-img" src="INTRO_MOCKUP_BASE64_PLACEHOLDER"
+        style="width: 100%; height: 100%; object-fit: contain; display: block;" alt="Intro" />
+      <button onclick="startOnboardingSlides()"
+        style="position: absolute; bottom: 40px; left: 24px; right: 24px; background: #000000; color: #FFFFFF; font-family: var(--font-sans); font-weight: 600; border-radius: 8px; padding: 14px 20px; font-size: 13px; border: none; cursor: pointer; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background 0.2s ease;">Start
+        syncing</button>
     </div>
 
     <!-- Onboarding Section -->
-    <div id="onboarding-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; overflow-y: auto; box-sizing: border-box; height: 100%;">
-      
+    <div id="onboarding-section"
+      style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; overflow-y: auto; box-sizing: border-box; height: 100%;">
+
       <!-- Logo & Header -->
       <div class="logo-container" style="justify-content: center; margin-bottom: 24px;">
         <div class="logo-dot"></div>
@@ -569,10 +648,12 @@
       </div>
 
       <!-- Onboarding slides (Carousel) -->
-      <div style="position: relative; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 24px;">
-        
+      <div
+        style="position: relative; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 24px;">
+
         <!-- Slide 1 -->
-        <div class="onboarding-slide" id="slide-1" style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+        <div class="onboarding-slide" id="slide-1"
+          style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
           <div style="font-size: 36px; line-height: 1;">📱</div>
           <div style="font-weight: 700; font-size: 14px;">1. Capture User Flows</div>
           <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
@@ -581,7 +662,8 @@
         </div>
 
         <!-- Slide 2 -->
-        <div class="onboarding-slide" id="slide-2" style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+        <div class="onboarding-slide" id="slide-2"
+          style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
           <div style="font-size: 36px; line-height: 1;">☁️</div>
           <div style="font-weight: 700; font-size: 14px;">2. Auto-Sync to Cloud</div>
           <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
@@ -590,7 +672,8 @@
         </div>
 
         <!-- Slide 3 -->
-        <div class="onboarding-slide" id="slide-3" style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
+        <div class="onboarding-slide" id="slide-3"
+          style="display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.3s;">
           <div style="font-size: 36px; line-height: 1;">🎨</div>
           <div style="font-weight: 700; font-size: 14px;">3. Import to Figma</div>
           <div style="color: var(--color-text-muted); font-size: 12px; padding: 0 16px;">
@@ -603,18 +686,26 @@
       <div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">
         <!-- Indicator Dots -->
         <div style="display: flex; gap: 6px;">
-          <div class="onboarding-dot active" id="dot-1" onclick="showSlide(1)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-brand); cursor: pointer; transition: var(--transition);"></div>
-          <div class="onboarding-dot" id="dot-2" onclick="showSlide(2)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);"></div>
-          <div class="onboarding-dot" id="dot-3" onclick="showSlide(3)" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);"></div>
+          <div class="onboarding-dot active" id="dot-1" onclick="showSlide(1)"
+            style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-brand); cursor: pointer; transition: var(--transition);">
+          </div>
+          <div class="onboarding-dot" id="dot-2" onclick="showSlide(2)"
+            style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);">
+          </div>
+          <div class="onboarding-dot" id="dot-3" onclick="showSlide(3)"
+            style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-border); cursor: pointer; transition: var(--transition);">
+          </div>
         </div>
 
         <button class="btn" id="btn-next-slide" onclick="nextSlide()" style="width: 100%;">Next</button>
-        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;" onclick="skipOnboarding()">Skip to Sign In</span>
+        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;"
+          onclick="skipOnboarding()">Skip to Sign In</span>
       </div>
     </div>
 
     <!-- Login Section -->
-    <div id="login-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; box-sizing: border-box; height: 100%; overflow-y: auto;">
+    <div id="login-section"
+      style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 24px 16px 16px 16px; box-sizing: border-box; height: 100%; overflow-y: auto;">
       <div class="logo-container" style="justify-content: center; margin-bottom: 16px;">
         <div class="logo-dot"></div>
         <div class="logo-text" style="font-size: 16px;">Sync Screen</div>
@@ -622,14 +713,20 @@
 
       <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center;">
         <!-- Tabs header -->
-        <div style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius); margin-bottom: 8px;">
-          <button id="auth-tab-signin" class="tab-btn active" style="padding: 4px;" onclick="switchAuthTabMode('signin')">Sign In</button>
-          <button id="auth-tab-signup" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('signup')">Sign Up</button>
-          <button id="auth-tab-qr" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('qr')">QR Login</button>
+        <div
+          style="display: flex; background: var(--color-surface); padding: 2px; border-radius: var(--radius); margin-bottom: 8px;">
+          <button id="auth-tab-signin" class="tab-btn active" style="padding: 4px;"
+            onclick="switchAuthTabMode('signin')">Sign In</button>
+          <button id="auth-tab-signup" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('signup')">Sign
+            Up</button>
+          <button id="auth-tab-qr" class="tab-btn" style="padding: 4px;" onclick="switchAuthTabMode('qr')">QR
+            Login</button>
         </div>
 
         <!-- Error Message Banner -->
-        <div id="onboarding-auth-error" style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;"></div>
+        <div id="onboarding-auth-error"
+          style="display: none; color: #FF3B30; font-size: 11px; font-weight: 500; padding: 8px 10px; background-color: #FFEBE9; border: 1px solid #FFC4C0; border-radius: var(--radius); margin-bottom: 4px;">
+        </div>
 
         <!-- Email Forms View -->
         <div id="email-forms-view" style="display: flex; flex-direction: column; gap: 8px;">
@@ -641,28 +738,38 @@
             <label for="onboarding-input-password">Password</label>
             <input type="password" id="onboarding-input-password" placeholder="••••••••" />
           </div>
-          <div id="onboarding-forgot-password-container" style="display: flex; justify-content: flex-end; margin-top: -2px; margin-bottom: 4px;">
-            <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;" onclick="handleOnboardingForgotPassword()">Forgot Password?</span>
+          <div id="onboarding-forgot-password-container"
+            style="display: flex; justify-content: flex-end; margin-top: -2px; margin-bottom: 4px;">
+            <span style="font-size: 10px; color: var(--color-brand); cursor: pointer; text-decoration: underline;"
+              onclick="handleOnboardingForgotPassword()">Forgot Password?</span>
           </div>
           <button class="btn" id="btn-onboarding-auth" onclick="handleOnboardingAuthAction()">Sign In</button>
         </div>
 
         <!-- QR Login View -->
-        <div id="qr-login-view" style="display: none; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-top: 10px;">
-          <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; width: 160px; height: 160px; box-sizing: border-box;">
+        <div id="qr-login-view"
+          style="display: none; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-top: 10px;">
+          <div
+            style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; width: 160px; height: 160px; box-sizing: border-box;">
             <img id="qr-code-img" src="" alt="Pairing QR Code" style="width: 136px; height: 136px; display: none;" />
-            <div id="qr-loading-spinner" style="width: 24px; height: 24px; border: 2px solid #ddd; border-top-color: var(--color-brand); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <div id="qr-loading-spinner"
+              style="width: 24px; height: 24px; border: 2px solid #ddd; border-top-color: var(--color-brand); border-radius: 50%; animation: spin 0.8s linear infinite;">
+            </div>
           </div>
           <div style="font-size: 11px; color: var(--color-text-muted); line-height: 1.4; padding: 0 12px;">
-            Open the <b>UX Auditor</b> companion app or Web App on your phone, click <b>Scan QR</b>, and scan this code to login instantly.
+            Open the <b>UX Auditor</b> companion app or Web App on your phone, click <b>Scan QR</b>, and scan this code
+            to login instantly.
           </div>
-          <div id="qr-status-text" style="font-family: var(--font-mono); font-size: 10px; color: var(--color-brand); font-weight: 600;">Waiting for scanner...</div>
+          <div id="qr-status-text"
+            style="font-family: var(--font-mono); font-size: 10px; color: var(--color-brand); font-weight: 600;">Waiting
+            for scanner...</div>
         </div>
       </div>
 
       <!-- Back to onboarding -->
       <div style="text-align: center; margin-top: 16px;">
-        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;" onclick="backToOnboarding()">Back to Info</span>
+        <span style="font-size: 11px; color: var(--color-text-muted); text-decoration: underline; cursor: pointer;"
+          onclick="backToOnboarding()">Back to Info</span>
       </div>
     </div>
 
@@ -703,14 +810,14 @@
         d.classList.remove('active');
         d.style.backgroundColor = 'var(--color-border)';
       });
-      
+
       currentSlide = slideIndex;
       document.getElementById(`slide-${slideIndex}`).style.display = 'flex';
-      
+
       const dot = document.getElementById(`dot-${slideIndex}`);
       dot.classList.add('active');
       dot.style.backgroundColor = 'var(--color-brand)';
-      
+
       const btn = document.getElementById('btn-next-slide');
       if (slideIndex === 3) {
         btn.innerText = "Get Started";
@@ -747,7 +854,7 @@
       document.getElementById('auth-tab-signup').classList.remove('active');
       document.getElementById('auth-tab-qr').classList.remove('active');
       document.getElementById(`auth-tab-${mode}`).classList.add('active');
-      
+
       hideOnboardingAuthError();
       stopQrPolling();
 
@@ -758,7 +865,7 @@
       } else {
         document.getElementById('qr-login-view').style.display = 'none';
         document.getElementById('email-forms-view').style.display = 'flex';
-        
+
         const actionBtn = document.getElementById('btn-onboarding-auth');
         actionBtn.innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
         document.getElementById('onboarding-forgot-password-container').style.display = mode === 'signin' ? 'flex' : 'none';
@@ -809,8 +916,8 @@
         if (activeOnboardingAuthMode === 'signin') {
           authResult = await supabaseClient.auth.signInWithPassword({ email, password });
         } else {
-          authResult = await supabaseClient.auth.signUp({ 
-            email, 
+          authResult = await supabaseClient.auth.signUp({
+            email,
             password,
             options: {
               emailRedirectTo: 'https://figma.com'
@@ -821,7 +928,7 @@
         if (authResult.error) throw authResult.error;
 
         const user = authResult.data.user;
-        
+
         if (activeOnboardingAuthMode === 'signin') {
           updateStatus("Signed in successfully!");
           updateAuthState(user);
@@ -864,6 +971,18 @@
       }
     }
 
+    // Safe offline UUIDv4 generator fallback for sandboxed environments where crypto.randomUUID is not available
+    function generateUUID() {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
     // QR Login pairing system
     async function startQrPolling() {
       stopQrPolling();
@@ -874,7 +993,7 @@
       document.getElementById('qr-status-text').innerText = "Generating token...";
       document.getElementById('qr-status-text').style.color = "var(--color-text-muted)";
 
-      currentPairingToken = crypto.randomUUID();
+      currentPairingToken = generateUUID();
 
       try {
         const { error } = await supabaseClient
@@ -954,7 +1073,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-        
+
         // Listen for auth state changes to persist/clear session
         supabaseClient.auth.onAuthStateChange((event, session) => {
           if (session) {
@@ -978,7 +1097,7 @@
 
         // Request saved session from Figma main thread
         parent.postMessage({ pluginMessage: { type: 'get-session' } }, '*');
-        
+
         startPolling();
       } catch (e) {
         updateStatus("Client Init Error: " + e.message);
@@ -991,7 +1110,7 @@
       const syncPane = document.getElementById('view-sync');
       const settingsPane = document.getElementById('view-settings');
       const gearIcon = document.querySelector('#settings-toggle-btn svg');
-      
+
       if (showingSettings) {
         syncPane.classList.remove('active');
         settingsPane.classList.add('active');
@@ -1018,7 +1137,7 @@
       document.getElementById('auth-toggle-signin').classList.remove('active');
       document.getElementById('auth-toggle-signup').classList.remove('active');
       document.getElementById(`auth-toggle-${mode}`).classList.add('active');
-      
+
       const actionBtn = document.getElementById('btn-auth-action');
       actionBtn.innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
 
@@ -1071,8 +1190,8 @@
         if (activeAuthMode === 'signin') {
           authResult = await supabaseClient.auth.signInWithPassword({ email, password });
         } else {
-          authResult = await supabaseClient.auth.signUp({ 
-            email, 
+          authResult = await supabaseClient.auth.signUp({
+            email,
             password,
             options: {
               emailRedirectTo: 'https://figma.com'
@@ -1083,7 +1202,7 @@
         if (authResult.error) throw authResult.error;
 
         const user = authResult.data.user;
-        
+
         if (activeAuthMode === 'signin') {
           updateStatus("Signed in successfully!");
           updateAuthState(user);
@@ -1160,7 +1279,7 @@
         signedInNode.style.display = 'flex';
         signedOutNode.style.display = 'none';
         document.getElementById('auth-email-display').innerText = user.email;
-        
+
         if (emptyStateTitle) {
           emptyStateTitle.innerText = "No Flows Recorded Yet";
           emptyStateSubtitle.innerHTML = `Start recording a session on your phone under user email: <b>${user.email}</b>`;
@@ -1178,12 +1297,12 @@
         if (controlsPanel) {
           controlsPanel.style.display = 'none';
         }
-        
+
         fetchSessions();
       } else {
         mainAppContainer.style.display = 'none';
         onboardingAuthContainer.style.display = 'flex';
-        
+
         // Reset onboarding state to intro screen
         document.getElementById('onboarding-intro').style.display = 'flex';
         document.getElementById('onboarding-section').style.display = 'none';
@@ -1191,7 +1310,7 @@
 
         signedInNode.style.display = 'none';
         signedOutNode.style.display = 'flex';
-        
+
         if (emptyStateTitle) {
           emptyStateTitle.innerText = "Sign-In Required";
           emptyStateSubtitle.innerText = "Please Sign In under the Settings tab to access your audit flows.";
@@ -1200,7 +1319,7 @@
         if (controlsPanel) {
           controlsPanel.style.display = 'none';
         }
-        
+
         sessionsList = [];
         renderSessions();
       }
@@ -1243,7 +1362,7 @@
 
       if (sessionsList.length === 0) {
         const isUserAuthenticated = supabaseClient && currentUser;
-        
+
         container.innerHTML = `
           <div class="empty-state">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1354,7 +1473,7 @@
 
         // 2. Download all screenshots & parse to Byte Arrays (Uint8Array) for Figma main thread
         const processedScreens = [];
-        
+
         for (let i = 0; i < screens.length; i++) {
           const s = screens[i];
           const progressStep = 25 + Math.floor((i / screens.length) * 65);
@@ -1364,14 +1483,14 @@
           try {
             const response = await fetch(s.image_url);
             if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-            
+
             const buffer = await response.arrayBuffer();
             const bytes = new Uint8Array(buffer);
 
             // Load the image bytes into a temporary HTML Image to determine exact dimensions
             const blob = new Blob([bytes], { type: 'image/png' });
             const blobUrl = URL.createObjectURL(blob);
-            
+
             const img = new Image();
             await new Promise((resolve) => {
               img.onload = () => resolve();
@@ -1383,7 +1502,7 @@
               };
               img.src = blobUrl;
             });
-            
+
             const imageWidth = img.naturalWidth || session.screen_width_px || 360;
             const imageHeight = img.naturalHeight || session.screen_height_px || 800;
             URL.revokeObjectURL(blobUrl);
@@ -1432,7 +1551,7 @@
     // Toggle overlay visibility
     function handleIndicatorToggle() {
       const isChecked = document.getElementById('toggle-indicators-chk').checked;
-      
+
       parent.postMessage({
         pluginMessage: {
           type: 'toggle-indicators',
@@ -1499,7 +1618,7 @@
         updateStatus(msg.message);
         showProgressBar(false);
       }
-      
+
       if (msg.type === 'error') {
         updateStatus(`Error: ${msg.message}`);
         showProgressBar(false);
@@ -1507,4 +1626,5 @@
     };
   </script>
 </body>
+
 </html>

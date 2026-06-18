@@ -137,7 +137,9 @@ create policy "Allow public to read pairing request by token" on public.qr_pairi
 
 -- 3. Authenticated mobile apps can complete the pairing by updating the row
 create policy "Allow authenticated users to pair session" on public.qr_pairings
-    for update to authenticated using ( status = 'pending' );
+    for update to authenticated 
+    using ( status = 'pending' )
+    with check ( status = 'paired' );
 
 -- 4. Anyone can delete a pairing request to clean it up after matching
 create policy "Allow public to delete pairing request" on public.qr_pairings
