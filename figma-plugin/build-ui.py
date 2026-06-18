@@ -1,8 +1,10 @@
 import os
+import base64
 
 def build():
     src_ui = "src/ui.html"
     supabase_min = "src/supabase.min.js"
+    intro_img = "src/intro-mockup.png"
     dist_dir = "dist"
     dist_ui = "dist/ui.html"
 
@@ -20,6 +22,21 @@ def build():
     with open(src_ui, "r", encoding="utf-8") as f:
         html = f.read()
 
+    # 1. Base64 encode the intro image mockup
+    if os.path.exists(intro_img):
+        with open(intro_img, "rb") as f:
+            img_data = f.read()
+            base64_str = base64.b64encode(img_data).decode("utf-8")
+            data_url = f"data:image/png;base64,{base64_str}"
+            if "INTRO_MOCKUP_BASE64_PLACEHOLDER" in html:
+                html = html.replace("INTRO_MOCKUP_BASE64_PLACEHOLDER", data_url)
+                print("Inlined intro mockup image in base64 format.")
+            else:
+                print("Warning: INTRO_MOCKUP_BASE64_PLACEHOLDER not found in ui.html.")
+    else:
+        print(f"Warning: {intro_img} does not exist. Skipping image inlining.")
+
+    # 2. Inline Supabase script
     with open(supabase_min, "r", encoding="utf-8") as f:
         supabase_code = f.read()
 

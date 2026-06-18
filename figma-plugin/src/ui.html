@@ -551,10 +551,16 @@
   </div> <!-- #main-app-container -->
 
   <!-- Onboarding & Auth View -->
-  <div id="onboarding-auth-container" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between; overflow-y: auto;">
+  <div id="onboarding-auth-container" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between; overflow: hidden; background: #FFFFFF;">
     
+    <!-- Onboarding Intro Screen -->
+    <div id="onboarding-intro" style="display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; box-sizing: border-box; overflow: hidden; align-items: center; justify-content: flex-start; background: #FFFFFF;">
+      <img id="intro-mockup-img" src="INTRO_MOCKUP_BASE64_PLACEHOLDER" style="width: 100%; height: 100%; object-fit: contain; display: block;" alt="Intro" />
+      <button onclick="startOnboardingSlides()" style="position: absolute; bottom: 30px; left: 24px; right: 24px; background: #000000; color: #FFFFFF; font-family: var(--font-sans); font-weight: 600; border-radius: 10px; padding: 12px 20px; font-size: 13px; border: none; cursor: pointer; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background 0.2s ease;">Start syncing</button>
+    </div>
+
     <!-- Onboarding Section -->
-    <div id="onboarding-section" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0;">
+    <div id="onboarding-section" style="display: none; flex-direction: column; flex: 1; justify-content: space-between; padding: 12px 0; overflow-y: auto;">
       
       <!-- Logo & Header -->
       <div class="logo-container" style="justify-content: center; margin-bottom: 24px;">
@@ -683,6 +689,13 @@
     let activeOnboardingAuthMode = 'signin';
     let showingSettings = false;
 
+    // Onboarding Intro transition
+    function startOnboardingSlides() {
+      document.getElementById('onboarding-intro').style.display = 'none';
+      document.getElementById('onboarding-section').style.display = 'flex';
+      showSlide(1);
+    }
+
     // Onboarding Navigation helpers
     function showSlide(slideIndex) {
       document.querySelectorAll('.onboarding-slide').forEach(s => s.style.display = 'none');
@@ -723,8 +736,8 @@
     function backToOnboarding() {
       stopQrPolling();
       document.getElementById('login-section').style.display = 'none';
-      document.getElementById('onboarding-section').style.display = 'flex';
-      showSlide(1);
+      document.getElementById('onboarding-intro').style.display = 'flex';
+      document.getElementById('onboarding-section').style.display = 'none';
     }
 
     // Onboarding Auth Form Tab Switcher
@@ -1171,10 +1184,10 @@
         mainAppContainer.style.display = 'none';
         onboardingAuthContainer.style.display = 'flex';
         
-        // Reset onboarding state
-        document.getElementById('onboarding-section').style.display = 'flex';
+        // Reset onboarding state to intro screen
+        document.getElementById('onboarding-intro').style.display = 'flex';
+        document.getElementById('onboarding-section').style.display = 'none';
         document.getElementById('login-section').style.display = 'none';
-        showSlide(1);
 
         signedInNode.style.display = 'none';
         signedOutNode.style.display = 'flex';
