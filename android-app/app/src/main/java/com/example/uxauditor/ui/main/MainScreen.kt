@@ -127,8 +127,8 @@ fun MainScreen(
                                     val url = "https://naneeovpzwyfnbaaujpi.supabase.co"
                                     val anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbmVlb3Zwend5Zm5iYWF1anBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTYwMzIsImV4cCI6MjA5NTc3MjAzMn0.Ilb6N52RvkwpiQ8iI0vGpIvDOysNgkubzXFh5sSUoUk"
                                     
-                                    if (token == null || userUuid == null) {
-                                        Toast.makeText(context, "Please sign in again on your phone.", Toast.LENGTH_SHORT).show()
+                                    if (token == null || userUuid == null || refreshToken.isEmpty()) {
+                                        Toast.makeText(context, "Please sign out and sign in again on your phone to refresh security tokens.", Toast.LENGTH_LONG).show()
                                         return@addOnSuccessListener
                                     }
 
